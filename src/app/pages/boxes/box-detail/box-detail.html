@@ -1,0 +1,87 @@
+<div class="box-detail-page">
+  @if (viewModel$ | async; as vm) {
+    <div class="page-header mb-6">
+      <button class="btn-back d-flex align-center gap-2 mb-4 text-muted" (click)="goBack()">
+        <lucide-angular name="chevron-right" class="rotate-180" size="16"></lucide-angular>
+        Voltar para Boxes
+      </button>
+      
+      <div class="d-flex justify-between align-center">
+        <div>
+          <h1 class="text-2xl font-bold d-flex align-center gap-3">
+            {{ vm.box.code }}
+            <span class="text-muted text-base font-normal">| {{ vm.box.name }}</span>
+          </h1>
+          <div class="mt-2 d-flex gap-3 align-center">
+            <app-status-badge [status]="vm.box.operationalStatus" type="operational"></app-status-badge>
+            <app-status-badge *ngIf="vm.latestMeasurement" [status]="vm.latestMeasurement.status" type="measurement"></app-status-badge>
+            <div class="material-chip" [style.background-color]="vm.material?.displayColor + '20'" [style.color]="vm.material?.displayColor">
+              <lucide-angular name="package" size="14"></lucide-angular>
+              {{ vm.material ? vm.material.name : 'Vazio' }}
+            </div>
+          </div>
+        </div>
+        <div class="actions d-flex gap-4">
+          <button class="btn btn-primary d-flex align-center gap-2">
+            <lucide-angular name="history" size="16"></lucide-angular>
+            Atualizar Leitura
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="tabs d-flex gap-6 mb-6">
+      <button class="tab" [class.active]="activeTab === 'geral'" (click)="setTab('geral')">Visão Geral</button>
+      <button class="tab" [class.active]="activeTab === 'historico'" (click)="setTab('historico')">Histórico de Ocupação</button>
+      <button class="tab" [class.active]="activeTab === 'tendencia'" (click)="setTab('tendencia')">Tendência de Volume</button>
+    </div>
+
+    <div class="tab-content">
+      @if (activeTab === 'geral') {
+        <div class="grid-geral">
+          <!-- Main KPIs -->
+          <div class="card kpi-highlight d-flex flex-col justify-between">
+            <div>
+              <div class="text-muted font-medium">Volume Atual Estimado</div>
+              <div class="text-4xl font-bold mt-2">
+                {{ (vm.latestMeasurement?.volumeM3 || 0) | number:'1.0-0' }} <span class="text-lg text-muted">m³</span>
+              </div>
+            </div>
+            <div class="mt-4 text-sm text-muted d-flex justify-between">
+              <span>Capacidade total: {{ vm.box.maxVolumeCapacityM3 | number:'1.0-0' }} m³</span>
+              <span>
+                {{ ((vm.latestMeasurement?.volumeM3 || 0) / vm.box.maxVolumeCapacityM3) * 100 | number:'1.0-1' }}%
+              </span>
+            </div>
+            <div class="progress-bar mt-2">
+              <div class="progress-fill" [style.width]="((vm.latestMeasurement?.volumeM3 || 0) / vm.box.maxVolumeCapacityM3) * 100 + '%'"></div>
+            </div>
+          </div>
+          
+          <div class="card flex-center text-muted flex-col">
+            <lucide-angular name="box" size="48" class="mb-4 opacity-50"></lucide-angular>
+            <p>Visualização 3D em desenvolvimento</p>
+          </div>
+        </div>
+      }
+      
+      @if (activeTab === 'historico') {
+        <div class="card">
+          <h3 class="font-bold mb-4">Histórico Recente</h3>
+          <p class="text-muted">A interface de ciclos de material será renderizada aqui.</p>
+        </div>
+      }
+
+      @if (activeTab === 'tendencia') {
+        <div class="card">
+          <h3 class="font-bold mb-4">Evolução do Volume</h3>
+          <p class="text-muted">O gráfico de evolução das últimas leituras será renderizado aqui.</p>
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="loading text-center p-8 text-muted">
+      Carregando box...
+    </div>
+  }
+</div>

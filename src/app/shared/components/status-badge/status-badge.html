@@ -1,0 +1,4 @@
+<span class="badge text-xs font-semibold" [ngClass]="badgeClass">
+  <span *ngIf="type === 'measurement'" class="dot"></span>
+  {{ formattedStatus | uppercase }}
+</span>

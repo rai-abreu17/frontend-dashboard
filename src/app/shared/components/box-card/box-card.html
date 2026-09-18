@@ -1,0 +1,60 @@
+<div class="box-card card d-flex flex-col justify-between">
+  <div class="box-header d-flex justify-between align-center">
+    <div class="box-title-group">
+      <h3 class="text-lg font-bold m-0">{{ box.code }}</h3>
+      <div class="material-name text-sm font-medium mt-1" 
+           [style.color]="material?.displayColor || 'var(--color-text-muted)'">
+        {{ material ? material.name : 'Sem material' }}
+      </div>
+    </div>
+    <app-status-badge [status]="box.operationalStatus" type="operational"></app-status-badge>
+  </div>
+
+  <div class="box-body mt-4">
+    <div class="volume-display">
+      <span class="text-2xl font-bold">
+        {{ latestMeasurement?.volumeM3 !== null && latestMeasurement?.volumeM3 !== undefined ? (latestMeasurement!.volumeM3 | number:'1.0-0') + ' m³' : '--' }}
+      </span>
+      <span class="text-sm text-muted ml-2">{{ occupancyPercentage }}% ocupado</span>
+    </div>
+    
+    <div class="progress-bar mt-2 mb-3">
+      <div class="progress-track" style="height: 8px; border-radius: 4px; overflow: hidden; background: var(--color-bg-app); box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);">
+        <div class="progress-fill" 
+             [style.width.%]="occupancyPercentage"
+             style="height: 100%; transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); background: linear-gradient(90deg, var(--color-primary-light), var(--color-primary)); border-radius: 4px;">
+        </div>
+      </div>
+    </div>
+    
+    @if (trend) {
+      <div class="trend-info text-xs font-medium text-success d-flex align-center gap-1 mb-2">
+        <lucide-angular name="trending-up" size="14"></lucide-angular>
+        <span>{{ trend }}</span>
+      </div>
+    }
+    
+    <div class="measurement-info d-flex align-center justify-between mt-2">
+      <div class="time-info text-xs text-muted">
+        Última: {{ latestMeasurement ? (latestMeasurement.capturedAt | date:'shortTime') : '--' }}
+      </div>
+      <app-status-badge 
+        *ngIf="latestMeasurement" 
+        [status]="latestMeasurement.status" 
+        type="measurement">
+      </app-status-badge>
+    </div>
+    
+    <div class="alert-info text-xs mt-2 d-flex align-center gap-2" *ngIf="latestAttemptFailed">
+      <lucide-angular name="alert-triangle" size="14" class="text-warning"></lucide-angular>
+      <span class="text-warning font-medium">Última tentativa falhou</span>
+    </div>
+  </div>
+
+  <div class="box-footer mt-4 pt-4">
+    <button class="btn-link d-flex align-center gap-1 text-sm font-medium">
+      Ver detalhes
+      <lucide-angular name="chevron-right" size="16"></lucide-angular>
+    </button>
+  </div>
+</div>

@@ -1,0 +1,181 @@
+<div class="dashboard-page">
+  <div class="page-header mb-6 d-flex justify-between align-end">
+    <div>
+      <h1 class="text-2xl font-bold">Visão Geral</h1>
+      <p class="text-muted">Acompanhamento e previsão da operação</p>
+    </div>
+    
+    <!-- Time Period Selector -->
+    <div class="period-selector bg-surface border rounded-md d-flex overflow-hidden">
+      <button class="btn-period" [class.active]="selectedPeriod === '1d'" (click)="setPeriod('1d')">Hoje</button>
+      <button class="btn-period" [class.active]="selectedPeriod === '7d'" (click)="setPeriod('7d')">7 dias</button>
+      <button class="btn-period" [class.active]="selectedPeriod === '30d'" (click)="setPeriod('30d')">30 dias</button>
+      <button class="btn-period" [class.active]="selectedPeriod === '90d'" (click)="setPeriod('90d')">3 meses</button>
+      <button class="btn-period text-primary d-flex align-center gap-1">
+        Personalizado <lucide-angular name="chevron-down" size="14"></lucide-angular>
+      </button>
+    </div>
+  </div>
+
+  @if (kpiStats$ | async; as stats) {
+    <div class="kpi-grid mb-8">
+      <app-kpi-card title="Volume Armazenado" [value]="stats.volumeTotal + ' m³'" trendValue="8,4% vs. período anterior" trendDirection="up" highlight="neutral"></app-kpi-card>
+      <app-kpi-card title="Ocupação Média" [value]="stats.ocupacaoMedia + '%'" trendValue="4 p.p. nos últimos 7 dias" trendDirection="up" highlight="neutral"></app-kpi-card>
+      <app-kpi-card title="Boxes em Operação" [value]="stats.total + ' / 10'" description="2 recebendo • 1 em retirada" highlight="neutral"></app-kpi-card>
+      <app-kpi-card title="Leituras Confiáveis" value="96,8%" trendValue="1,2 p.p." trendDirection="up" highlight="success"></app-kpi-card>
+      <app-kpi-card title="Riscos Identificados" value="2" description="1 requer atenção nas próximas 6h" highlight="danger"></app-kpi-card>
+    </div>
+  }
+
+  <!-- Main Analysis Section -->
+  <div class="analysis-grid mb-8">
+    <!-- Big Chart: Volume Evolution -->
+    <div class="card panel-card big-chart-panel d-flex flex-col">
+      <div class="d-flex justify-between align-center mb-4">
+        <h3 class="font-bold text-lg m-0">Evolução do Volume</h3>
+        <div class="legend-mock d-flex gap-4 text-xs text-muted">
+          <div class="d-flex align-center gap-1"><span class="legend-dot bg-primary"></span> Volume Realizado</div>
+          <div class="d-flex align-center gap-1"><span class="legend-dot border-dashed border-primary"></span> Previsão</div>
+        </div>
+      </div>
+      <div class="chart-container flex-1" style="min-height: 300px;">
+        <canvas baseChart
+          [data]="volumeChartData"
+          [options]="volumeChartOptions"
+          [type]="'line'">
+        </canvas>
+      </div>
+    </div>
+
+    <!-- Risks and Predictions -->
+    <div class="card panel-card risks-panel">
+      <div class="d-flex justify-between align-center mb-4">
+        <h3 class="font-bold text-lg m-0 d-flex align-center gap-2">
+          <lucide-angular name="alert-triangle" size="20" class="text-danger"></lucide-angular>
+          Previsões e Riscos
+        </h3>
+      </div>
+      <div class="panel-list">
+        @for (risk of risksAndPredictions; track risk.title) {
+          <div class="panel-item d-flex gap-3">
+            <div class="icon-container" [ngClass]="risk.severity === 'danger' ? 'bg-danger-subtle text-danger' : 'bg-warning-subtle text-warning'">
+              <lucide-angular name="alert-triangle" size="16"></lucide-angular>
+            </div>
+            <div class="flex-1">
+              <div class="d-flex justify-between align-center">
+                <span class="badge text-xs font-bold" [ngClass]="risk.severity === 'danger' ? 'bg-danger text-white' : 'bg-warning text-white'">{{ risk.box }}</span>
+                <span class="text-xs text-muted font-medium">Confiança: {{ risk.confidence }}</span>
+              </div>
+              <p class="text-sm font-bold mt-2 mb-1">{{ risk.title }}</p>
+              <p class="text-xs text-muted m-0">{{ risk.description }}</p>
+              <a href="#" class="text-xs text-primary font-medium d-flex align-center gap-1 mt-2">Ver análise <lucide-angular name="chevron-right" size="14"></lucide-angular></a>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Secondary Analysis Section -->
+  <div class="secondary-analysis-grid mb-8">
+    <!-- Movement Chart -->
+    <div class="card panel-card">
+      <h3 class="font-bold text-lg mb-4">Movimentação Operacional</h3>
+      <div class="chart-container" style="height: 250px;">
+        <canvas baseChart
+          [data]="movementChartData"
+          [options]="movementChartOptions"
+          [type]="'bar'">
+        </canvas>
+      </div>
+    </div>
+
+    <!-- Occupation by Box Chart -->
+    <div class="card panel-card">
+      <h3 class="font-bold text-lg mb-4">Ocupação por Box</h3>
+      <div class="chart-container" style="height: 250px;">
+        <canvas baseChart
+          [data]="occupationChartData"
+          [options]="occupationChartOptions"
+          [type]="'bar'">
+        </canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Operational Insights -->
+  <div class="card panel-card mb-8">
+    <h3 class="font-bold text-lg mb-4">Insights Operacionais</h3>
+    <div class="insights-grid">
+      @for (insight of insights; track insight.title) {
+        <div class="insight-card p-4 border rounded-md d-flex gap-3">
+          <div class="icon-container bg-{{insight.color}}-subtle text-{{insight.color}}">
+            <lucide-angular [name]="insight.icon" size="20"></lucide-angular>
+          </div>
+          <div>
+            <p class="text-sm font-bold m-0">{{ insight.title }}</p>
+            <p class="text-sm text-muted mt-1">{{ insight.description }}</p>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Operational Layer (Grade de Boxes) -->
+  <div class="main-content-grid">
+    <div class="boxes-section">
+      <h2 class="text-xl font-bold mb-4">Camada Operacional (Grade de Boxes)</h2>
+      <div class="box-grid">
+        @for (vm of viewModels$ | async; track vm.box.id) {
+          <app-box-card 
+            [box]="vm.box" 
+            [material]="vm.material" 
+            [latestMeasurement]="vm.latestMeasurement"
+            [trend]="vm.trend">
+          </app-box-card>
+        }
+      </div>
+    </div>
+
+    <div class="side-panels">
+      <div class="card mb-4 panel-card">
+        <div class="d-flex justify-between align-center mb-4">
+          <h3 class="font-bold text-lg m-0">Pendências Atuais</h3>
+          <span class="badge text-xs bg-danger text-white">{{ pendingAlerts.length }}</span>
+        </div>
+        <div class="panel-list">
+          @for (alert of pendingAlerts; track alert.title) {
+            <div class="panel-item d-flex gap-3">
+              <div class="icon-container" [ngClass]="alert.type === 'danger' ? 'bg-danger-subtle text-danger' : 'bg-warning-subtle text-warning'">
+                <lucide-angular name="alert-triangle" size="16"></lucide-angular>
+              </div>
+              <div>
+                <p class="text-sm font-medium m-0">{{ alert.title }}</p>
+                <p class="text-xs text-muted mt-1">{{ alert.time }}</p>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="card panel-card">
+        <div class="d-flex justify-between align-center mb-4">
+          <h3 class="font-bold text-lg m-0">Atividade Recente</h3>
+        </div>
+        <div class="panel-list">
+          @for (activity of recentActivities; track activity.text) {
+            <div class="panel-item d-flex gap-3">
+              <div class="icon-container bg-primary-subtle text-primary">
+                <lucide-angular [name]="activity.icon" size="16"></lucide-angular>
+              </div>
+              <div>
+                <p class="text-sm font-medium m-0">{{ activity.text }}</p>
+                <p class="text-xs text-muted mt-1">{{ activity.time }}</p>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

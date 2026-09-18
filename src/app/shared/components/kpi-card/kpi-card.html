@@ -1,0 +1,29 @@
+<div class="kpi-card card">
+  <div class="kpi-title text-sm text-muted font-medium">{{ title }}</div>
+  <div class="kpi-value text-2xl font-bold mt-2">{{ value }}</div>
+  @if (description) {
+    <div class="kpi-desc text-xs mt-1" [class]="'text-' + highlight">
+      {{ description }}
+    </div>
+  }
+  
+  @if (trendValue) {
+    <div class="kpi-trend text-xs font-medium mt-2 d-flex align-center gap-1"
+         [ngClass]="{
+           'text-success': trendDirection === 'up',
+           'text-danger': trendDirection === 'down',
+           'text-muted': trendDirection === 'neutral'
+         }">
+      @if (trendDirection === 'up') {
+        <lucide-angular name="arrow-up" size="14"></lucide-angular>
+      }
+      @if (trendDirection === 'down') {
+        <lucide-angular name="arrow-down" size="14"></lucide-angular>
+      }
+      @if (trendDirection === 'neutral') {
+        <lucide-angular name="minus" size="14"></lucide-angular>
+      }
+      <span>{{ trendValue }}</span>
+    </div>
+  }
+</div>

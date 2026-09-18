@@ -1,0 +1,234 @@
+/* Import Google Font */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+  /* Premium Colors */
+  --color-nav-bg: #09131F;
+  --color-nav-text: #FFFFFF;
+  --color-nav-hover: rgba(255, 255, 255, 0.05);
+  
+  --color-primary: #3B82F6;
+  --color-primary-hover: #2563EB;
+  --color-primary-light: #EFF6FF;
+  
+  --color-accent: #06B6D4;
+  --color-accent-light: #ECFEFF;
+  
+  --color-success: #10B981;
+  --color-success-bg: #D1FAE5;
+  
+  --color-warning: #F59E0B;
+  --color-warning-bg: #FEF3C7;
+  
+  --color-danger: #EF4444;
+  --color-danger-bg: #FEE2E2;
+  
+  --color-calibration: #8B5CF6;
+  --color-calibration-bg: #EDE9FE;
+
+  --color-text-main: #0F172A;
+  --color-text-muted: #64748B;
+  --color-text-light: #94A3B8;
+  
+  --color-bg-app: #F8FAFC;
+  --color-bg-surface: #FFFFFF;
+  --color-border: #F1F5F9;
+  --color-border-hover: #E2E8F0;
+
+  /* Typography */
+  --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  
+  /* Radii */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+  
+  /* Premium Shadows (Soft UI) */
+  --shadow-xs: 0 1px 3px rgba(15, 23, 42, 0.04);
+  --shadow-sm: 0 4px 6px -1px rgba(15, 23, 42, 0.04), 0 2px 4px -1px rgba(15, 23, 42, 0.03);
+  --shadow-md: 0 10px 15px -3px rgba(15, 23, 42, 0.05), 0 4px 6px -2px rgba(15, 23, 42, 0.025);
+  --shadow-lg: 0 20px 40px -10px rgba(15, 23, 42, 0.08);
+  --shadow-glow: 0 0 20px rgba(59, 130, 246, 0.15);
+  
+  /* Spacing */
+  --spacing-1: 4px;
+  --spacing-2: 8px;
+  --spacing-3: 12px;
+  --spacing-4: 16px;
+  --spacing-5: 20px;
+  --spacing-6: 24px;
+  --spacing-8: 32px;
+  --spacing-10: 40px;
+
+  /* Typography (as custom properties, for use inside CSS values like var(--text-sm)) */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.75rem;
+  --text-3xl: 2.25rem;
+
+  --font-light: 300;
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  background: var(--color-bg-app);
+  color: var(--color-text-main);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+/* Premium Card Utilities */
+.card {
+  background-color: var(--color-bg-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--color-border);
+  padding: var(--spacing-6);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  &:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+  }
+}
+
+.d-flex { display: flex; }
+.flex-col { flex-direction: column; }
+.flex-1 { flex: 1 1 auto; }
+.align-center { align-items: center; }
+.align-end { align-items: flex-end; }
+.justify-between { justify-content: space-between; }
+.justify-center { justify-content: center; }
+.overflow-hidden { overflow: hidden; }
+.text-center { text-align: center; }
+
+.gap-1 { gap: var(--spacing-1); }
+.gap-2 { gap: var(--spacing-2); }
+.gap-3 { gap: var(--spacing-3); }
+.gap-4 { gap: var(--spacing-4); }
+.gap-5 { gap: var(--spacing-5); }
+.gap-6 { gap: var(--spacing-6); }
+.gap-8 { gap: var(--spacing-8); }
+
+/* Spacing utilities (margin/padding), generated for the full spacing scale */
+.m-0 { margin: 0; }
+.p-0 { padding: 0; }
+
+$spacing-scale: 1, 2, 3, 4, 5, 6, 8, 10;
+@each $step in $spacing-scale {
+  .mt-#{$step} { margin-top: var(--spacing-#{$step}); }
+  .mb-#{$step} { margin-bottom: var(--spacing-#{$step}); }
+  .ml-#{$step} { margin-left: var(--spacing-#{$step}); }
+  .mr-#{$step} { margin-right: var(--spacing-#{$step}); }
+  .pt-#{$step} { padding-top: var(--spacing-#{$step}); }
+  .pb-#{$step} { padding-bottom: var(--spacing-#{$step}); }
+  .pl-#{$step} { padding-left: var(--spacing-#{$step}); }
+  .pr-#{$step} { padding-right: var(--spacing-#{$step}); }
+  .p-#{$step} { padding: var(--spacing-#{$step}); }
+}
+
+/* Border & radius utilities */
+.border { border: 1px solid var(--color-border); }
+.rounded-sm { border-radius: var(--radius-sm); }
+.rounded-md { border-radius: var(--radius-md); }
+.rounded-lg { border-radius: var(--radius-lg); }
+.rounded-xl { border-radius: var(--radius-xl); }
+.rounded-full { border-radius: var(--radius-full); }
+
+/* Surface & semantic background utilities */
+.bg-surface { background-color: var(--color-bg-surface); }
+.bg-app { background-color: var(--color-bg-app); }
+
+.bg-primary { background-color: var(--color-primary); }
+.bg-success { background-color: var(--color-success); }
+.bg-warning { background-color: var(--color-warning); }
+.bg-danger { background-color: var(--color-danger); }
+.bg-calibration { background-color: var(--color-calibration); }
+
+.bg-primary-subtle { background-color: var(--color-primary-light); }
+.bg-success-subtle { background-color: var(--color-success-bg); }
+.bg-warning-subtle { background-color: var(--color-warning-bg); }
+.bg-danger-subtle { background-color: var(--color-danger-bg); }
+.bg-calibration-subtle { background-color: var(--color-calibration-bg); }
+
+.text-white { color: #FFFFFF; }
+
+/* Typography utilities */
+.text-xs { font-size: 0.75rem; line-height: 1rem; }
+.text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+.text-base { font-size: 1rem; line-height: 1.5rem; }
+.text-lg { font-size: 1.125rem; line-height: 1.75rem; }
+.text-xl { font-size: 1.25rem; line-height: 1.75rem; letter-spacing: -0.01em; }
+.text-2xl { font-size: 1.75rem; line-height: 2.25rem; letter-spacing: -0.02em; }
+.text-3xl { font-size: 2.25rem; line-height: 2.5rem; letter-spacing: -0.02em; }
+
+.font-light { font-weight: 300; }
+.font-normal { font-weight: 400; }
+.font-medium { font-weight: 500; }
+.font-semibold { font-weight: 600; }
+.font-bold { font-weight: 700; }
+
+.text-muted { color: var(--color-text-muted); }
+.text-light { color: var(--color-text-light); }
+.text-neutral { color: var(--color-text-muted); }
+.text-primary { color: var(--color-primary); }
+.text-success { color: var(--color-success); }
+.text-warning { color: var(--color-warning); }
+.text-danger { color: var(--color-danger); }
+
+/* Generic pill badge, e.g. severity/status labels used directly in page templates */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  line-height: 1.4;
+}
+
+/* Icon container: small rounded box used to hold a lucide icon with a subtle background */
+.icon-container {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Glassmorphism Badge Utility */
+.glass-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}

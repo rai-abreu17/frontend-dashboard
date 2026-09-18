@@ -1,0 +1,118 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  align-items: center;
+  background-color: var(--color-primary); /* The reference shows a vibrant blue sidebar */
+}
+
+.sidebar-logo {
+  padding: var(--spacing-6) 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  
+  .logo-icon {
+    width: 40px;
+    height: 40px;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--text-xl);
+    font-weight: var(--font-bold);
+    color: var(--color-nav-text);
+  }
+}
+
+.sidebar-nav {
+  flex: 1;
+  width: 100%;
+  padding: var(--spacing-4) 0;
+  overflow-y: auto;
+  
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-2);
+  }
+  
+  a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-md);
+    color: rgba(255, 255, 255, 0.7);
+    transition: background-color 0.2s, color 0.2s;
+    
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: var(--color-nav-text);
+    }
+    
+    &.active {
+      background-color: var(--color-bg-app);
+      color: var(--color-primary);
+      border-radius: var(--radius-md);
+    }
+  }
+}
+
+.sidebar-footer {
+  padding: var(--spacing-6) 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+
+  .settings-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-md);
+    color: rgba(255, 255, 255, 0.7);
+    
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: var(--color-nav-text);
+    }
+  }
+}
+
+/* Mobile Responsiveness - Bottom Nav */
+@media (max-width: 768px) {
+  :host {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  
+  .sidebar-logo {
+    display: none;
+  }
+  
+  .sidebar-footer {
+    display: none;
+  }
+  
+  .sidebar-nav {
+    padding: 0;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    
+    ul {
+      flex-direction: row;
+      justify-content: space-around;
+      width: 100%;
+      gap: 0;
+    }
+  }
+}

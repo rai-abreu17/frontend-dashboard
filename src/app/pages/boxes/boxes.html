@@ -1,0 +1,48 @@
+<div class="boxes-page">
+  <div class="page-header mb-6 d-flex justify-between align-center">
+    <div>
+      <h1 class="text-2xl font-bold">Boxes</h1>
+      <p class="text-muted">Gestão e visão geral de todos os boxes</p>
+    </div>
+    <div class="actions d-flex gap-4">
+      <button class="btn btn-outline d-flex align-center gap-2">
+        <lucide-angular name="history" size="16"></lucide-angular>
+        Histórico Global
+      </button>
+    </div>
+  </div>
+
+  <div class="filters-card card mb-6 d-flex gap-4 align-center">
+    <div class="search-input d-flex align-center">
+      <lucide-angular name="search" size="18" class="text-muted"></lucide-angular>
+      <input type="text" placeholder="Buscar por box ou material..." (input)="onSearch($event)">
+    </div>
+    
+    <div class="filter-select">
+      <select (change)="onStatusChange($event)">
+        <option value="todos">Todos os Status</option>
+        <option value="livre">Livres</option>
+        <option value="recebendo">Recebendo</option>
+        <option value="armazenado">Armazenado</option>
+        <option value="manutencao">Em Manutenção</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="box-grid">
+    @for (vm of viewModels$ | async; track vm.box.id) {
+      <a [routerLink]="['/boxes', vm.box.id]" class="card-link">
+        <app-box-card 
+          [box]="vm.box" 
+          [material]="vm.material" 
+          [latestMeasurement]="vm.latestMeasurement">
+        </app-box-card>
+      </a>
+    }
+    @empty {
+      <div class="empty-state text-center text-muted card">
+        Nenhum box encontrado com os filtros atuais.
+      </div>
+    }
+  </div>
+</div>
