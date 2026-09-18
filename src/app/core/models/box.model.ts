@@ -12,4 +12,8 @@ export interface Box {
   latestAttemptId: string | null;
   instrumented: boolean;
   maxVolumeCapacityM3: number;
+  /** Dimensões reais do box, usadas só para a proporção visual da cena 3D. */
+  widthM: number;
+  lengthM: number;
+  sizeClass: 'GRANDE' | 'PEQUENO';
 }

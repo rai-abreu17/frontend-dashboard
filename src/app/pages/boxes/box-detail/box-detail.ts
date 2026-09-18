@@ -11,6 +11,7 @@ import { Material } from '../../../core/models/material.model';
 import { Measurement } from '../../../core/models/measurement.model';
 import { OperationalEvent, AcquisitionAttempt } from '../../../core/models/operational-event.model';
 import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge';
+import { Box3dViewerComponent } from '../../../shared/components/box-3d-viewer/box-3d-viewer';
 import { LucideAngularModule } from 'lucide-angular';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartOptions } from 'chart.js';
@@ -33,7 +34,7 @@ interface HistoryRow {
 
 @Component({
   selector: 'app-box-detail',
-  imports: [CommonModule, StatusBadgeComponent, LucideAngularModule, BaseChartDirective],
+  imports: [CommonModule, StatusBadgeComponent, Box3dViewerComponent, LucideAngularModule, BaseChartDirective],
   templateUrl: './box-detail.html',
   styleUrl: './box-detail.scss'
 })

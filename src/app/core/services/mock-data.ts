@@ -12,17 +12,22 @@ export const MOCK_MATERIALS: Material[] = [
   { id: 'm5', name: 'Material E', active: true, displayColor: '#EC4899' },
 ];
 
+// 7 boxes grandes (17,5 x 47,63 m, ~833,45 m² de piso) + 3 boxes pequenos (11,5 x 47,62 m, ~547,70 m² de piso).
+// Dimensões reais, usadas só para a proporção visual da cena 3D — não alteram maxVolumeCapacityM3.
+const GRANDE = { widthM: 17.5, lengthM: 47.63, sizeClass: 'GRANDE' as const };
+const PEQUENO = { widthM: 11.5, lengthM: 47.62, sizeClass: 'PEQUENO' as const };
+
 export const MOCK_BOXES: Box[] = [
-  { id: 'b1', code: 'BOX-01', name: 'Box 01', operationalStatus: 'RECEBENDO', measurementStatus: 'VALIDA', currentMaterialId: 'm1', lastMaterialId: null, latestValidMeasurementId: 'ms1', latestAttemptId: 'at1', instrumented: true, maxVolumeCapacityM3: 5000 },
-  { id: 'b2', code: 'BOX-02', name: 'Box 02', operationalStatus: 'ARMAZENADO', measurementStatus: 'VALIDA', currentMaterialId: 'm2', lastMaterialId: null, latestValidMeasurementId: 'ms2', latestAttemptId: 'at2', instrumented: true, maxVolumeCapacityM3: 5000 },
-  { id: 'b3', code: 'BOX-03', name: 'Box 03', operationalStatus: 'EM_LIMPEZA', measurementStatus: 'VENCIDA', currentMaterialId: null, lastMaterialId: 'm3', latestValidMeasurementId: 'ms3', latestAttemptId: 'at3', instrumented: true, maxVolumeCapacityM3: 5000 },
-  { id: 'b4', code: 'BOX-04', name: 'Box 04', operationalStatus: 'LIVRE', measurementStatus: 'VALIDA', currentMaterialId: null, lastMaterialId: null, latestValidMeasurementId: 'ms4', latestAttemptId: 'at4', instrumented: true, maxVolumeCapacityM3: 5000 },
-  { id: 'b5', code: 'BOX-05', name: 'Box 05', operationalStatus: 'EM_RETIRADA', measurementStatus: 'VALIDA', currentMaterialId: 'm4', lastMaterialId: null, latestValidMeasurementId: 'ms5', latestAttemptId: 'at5', instrumented: true, maxVolumeCapacityM3: 5000 },
-  { id: 'b6', code: 'BOX-06', name: 'Box 06', operationalStatus: 'ARMAZENADO', measurementStatus: 'INCONCLUSIVA', currentMaterialId: 'm1', lastMaterialId: null, latestValidMeasurementId: 'ms6', latestAttemptId: 'at6', instrumented: true, maxVolumeCapacityM3: 5000 },
-  { id: 'b7', code: 'BOX-07', name: 'Box 07', operationalStatus: 'RECEBENDO', measurementStatus: 'VALIDA', currentMaterialId: 'm5', lastMaterialId: null, latestValidMeasurementId: 'ms7', latestAttemptId: 'at7', instrumented: true, maxVolumeCapacityM3: 5000 },
-  { id: 'b8', code: 'BOX-08', name: 'Box 08', operationalStatus: 'EM_MANUTENCAO', measurementStatus: 'RECALIBRACAO_NECESSARIA', currentMaterialId: null, lastMaterialId: null, latestValidMeasurementId: 'ms8', latestAttemptId: 'at8', instrumented: true, maxVolumeCapacityM3: 5000 },
-  { id: 'b9', code: 'BOX-09', name: 'Box 09', operationalStatus: 'ARMAZENADO', measurementStatus: 'VALIDA', currentMaterialId: 'm2', lastMaterialId: null, latestValidMeasurementId: 'ms9', latestAttemptId: 'at9', instrumented: true, maxVolumeCapacityM3: 5000 },
-  { id: 'b10', code: 'BOX-10', name: 'Box 10', operationalStatus: 'LIVRE', measurementStatus: 'NAO_INSTRUMENTADO', currentMaterialId: null, lastMaterialId: null, latestValidMeasurementId: null, latestAttemptId: null, instrumented: false, maxVolumeCapacityM3: 5000 },
+  { id: 'b1', code: 'BOX-01', name: 'Box 01', operationalStatus: 'RECEBENDO', measurementStatus: 'VALIDA', currentMaterialId: 'm1', lastMaterialId: null, latestValidMeasurementId: 'ms1', latestAttemptId: 'at1', instrumented: true, maxVolumeCapacityM3: 5000, ...GRANDE },
+  { id: 'b2', code: 'BOX-02', name: 'Box 02', operationalStatus: 'ARMAZENADO', measurementStatus: 'VALIDA', currentMaterialId: 'm2', lastMaterialId: null, latestValidMeasurementId: 'ms2', latestAttemptId: 'at2', instrumented: true, maxVolumeCapacityM3: 5000, ...GRANDE },
+  { id: 'b3', code: 'BOX-03', name: 'Box 03', operationalStatus: 'EM_LIMPEZA', measurementStatus: 'VENCIDA', currentMaterialId: null, lastMaterialId: 'm3', latestValidMeasurementId: 'ms3', latestAttemptId: 'at3', instrumented: true, maxVolumeCapacityM3: 5000, ...GRANDE },
+  { id: 'b4', code: 'BOX-04', name: 'Box 04', operationalStatus: 'LIVRE', measurementStatus: 'VALIDA', currentMaterialId: null, lastMaterialId: null, latestValidMeasurementId: 'ms4', latestAttemptId: 'at4', instrumented: true, maxVolumeCapacityM3: 5000, ...GRANDE },
+  { id: 'b5', code: 'BOX-05', name: 'Box 05', operationalStatus: 'EM_RETIRADA', measurementStatus: 'VALIDA', currentMaterialId: 'm4', lastMaterialId: null, latestValidMeasurementId: 'ms5', latestAttemptId: 'at5', instrumented: true, maxVolumeCapacityM3: 5000, ...GRANDE },
+  { id: 'b6', code: 'BOX-06', name: 'Box 06', operationalStatus: 'ARMAZENADO', measurementStatus: 'INCONCLUSIVA', currentMaterialId: 'm1', lastMaterialId: null, latestValidMeasurementId: 'ms6', latestAttemptId: 'at6', instrumented: true, maxVolumeCapacityM3: 5000, ...GRANDE },
+  { id: 'b7', code: 'BOX-07', name: 'Box 07', operationalStatus: 'RECEBENDO', measurementStatus: 'VALIDA', currentMaterialId: 'm5', lastMaterialId: null, latestValidMeasurementId: 'ms7', latestAttemptId: 'at7', instrumented: true, maxVolumeCapacityM3: 5000, ...GRANDE },
+  { id: 'b8', code: 'BOX-08', name: 'Box 08', operationalStatus: 'EM_MANUTENCAO', measurementStatus: 'RECALIBRACAO_NECESSARIA', currentMaterialId: null, lastMaterialId: null, latestValidMeasurementId: 'ms8', latestAttemptId: 'at8', instrumented: true, maxVolumeCapacityM3: 5000, ...PEQUENO },
+  { id: 'b9', code: 'BOX-09', name: 'Box 09', operationalStatus: 'ARMAZENADO', measurementStatus: 'VALIDA', currentMaterialId: 'm2', lastMaterialId: null, latestValidMeasurementId: 'ms9', latestAttemptId: 'at9', instrumented: true, maxVolumeCapacityM3: 5000, ...PEQUENO },
+  { id: 'b10', code: 'BOX-10', name: 'Box 10', operationalStatus: 'LIVRE', measurementStatus: 'NAO_INSTRUMENTADO', currentMaterialId: null, lastMaterialId: null, latestValidMeasurementId: null, latestAttemptId: null, instrumented: false, maxVolumeCapacityM3: 5000, ...PEQUENO },
 ];
 
 export const MOCK_MEASUREMENTS: Measurement[] = [

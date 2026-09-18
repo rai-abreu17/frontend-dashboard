@@ -1,0 +1,21 @@
+<div class="viewer-wrapper">
+  <canvas #canvasRef class="viewer-canvas"></canvas>
+
+  @if (hasData) {
+    <div class="scrubber d-flex align-center gap-3">
+      <input
+        type="range"
+        min="0"
+        max="100"
+        [value]="sliderValue"
+        (input)="onSliderInput($event)"
+        class="scrubber-input" />
+      <div class="scrubber-readout text-xs text-muted">
+        <span class="font-medium">{{ currentLabel }}</span>
+        <span> · {{ currentVolumeM3 | number:'1.0-0' }} m³</span>
+      </div>
+    </div>
+  } @else {
+    <p class="text-xs text-muted text-center mt-2 mb-0">Sem histórico de medições para reproduzir o preenchimento deste box.</p>
+  }
+</div>

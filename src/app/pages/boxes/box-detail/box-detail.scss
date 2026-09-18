@@ -59,10 +59,8 @@
   transition: width 0.3s ease;
 }
 
-.flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.viewer-card {
+  min-height: 460px;
 }
 
 .region-map {
@@ -80,9 +78,5 @@
   &.observed {
     background-color: var(--color-primary);
   }
-}
-
-.placeholder-3d {
-  border-top: 1px solid var(--color-border);
 }
 

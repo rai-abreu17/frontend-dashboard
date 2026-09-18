@@ -69,6 +69,20 @@
               </div>
             </div>
 
+            <!-- Coverage / region map -->
+            <div class="card">
+              <div class="d-flex justify-between align-center mb-3">
+                <h3 class="font-bold text-sm m-0">Cobertura da Medição</h3>
+                <span class="text-sm font-bold text-primary">{{ vm.latestMeasurement?.coverageRatio != null ? (vm.latestMeasurement!.coverageRatio! * 100 | number:'1.0-0') + '%' : '--' }}</span>
+              </div>
+              <div class="region-map">
+                @for (observed of regionCells(vm.latestMeasurement); track $index) {
+                  <div class="region-cell" [class.observed]="observed"></div>
+                }
+              </div>
+              <p class="text-xs text-muted mt-3 mb-0">Mapa simulado das regiões observadas (azul) e não observadas (cinza) na varredura mais recente.</p>
+            </div>
+
             <!-- Rejected readings -->
             <div class="card">
               <h3 class="font-bold text-sm mb-3 d-flex align-center gap-2">
@@ -93,23 +107,15 @@
             </div>
           </div>
 
-          <!-- Coverage / region map -->
-          <div class="card">
-            <div class="d-flex justify-between align-center mb-3">
-              <h3 class="font-bold text-sm m-0">Cobertura da Medição</h3>
-              <span class="text-sm font-bold text-primary">{{ vm.latestMeasurement?.coverageRatio != null ? (vm.latestMeasurement!.coverageRatio! * 100 | number:'1.0-0') + '%' : '--' }}</span>
-            </div>
-            <div class="region-map">
-              @for (observed of regionCells(vm.latestMeasurement); track $index) {
-                <div class="region-cell" [class.observed]="observed"></div>
-              }
-            </div>
-            <p class="text-xs text-muted mt-3 mb-0">Mapa simulado das regiões observadas (azul) e não observadas (cinza) na varredura mais recente.</p>
-
-            <div class="flex-center text-muted flex-col mt-6 pt-6 placeholder-3d">
-              <lucide-angular name="box" size="40" class="mb-2 opacity-50"></lucide-angular>
-              <p class="text-sm m-0">Visualização 3D em desenvolvimento</p>
-            </div>
+          <!-- 3D viewer -->
+          <div class="card viewer-card d-flex flex-col">
+            <h3 class="font-bold text-sm mb-3">Visualização 3D — Preenchimento do Box</h3>
+            <app-box-3d-viewer
+              class="flex-1"
+              [box]="vm.box"
+              [measurements]="vm.measurements"
+              [materialColor]="vm.material?.displayColor">
+            </app-box-3d-viewer>
           </div>
         </div>
       }
