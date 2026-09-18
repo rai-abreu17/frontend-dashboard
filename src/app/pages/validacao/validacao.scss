@@ -1,0 +1,31 @@
+.validacao-page {
+  width: 100%;
+}
+
+.notice {
+  background-color: var(--color-primary-light);
+  padding: var(--spacing-4) var(--spacing-5);
+}
+
+.test-row {
+  cursor: pointer;
+}
+
+.detail-row td {
+  padding: 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.detail-panel {
+  padding: var(--spacing-5);
+  background-color: var(--color-bg-app);
+}
+
+.params-list {
+  margin: 0;
+  padding-left: var(--spacing-4);
+
+  li {
+    margin-bottom: var(--spacing-1);
+  }
+}

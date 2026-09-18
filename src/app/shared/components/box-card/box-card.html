@@ -17,7 +17,18 @@
       </span>
       <span class="text-sm text-muted ml-2">{{ occupancyPercentage }}% ocupado</span>
     </div>
-    
+
+    @if (latestMeasurement?.volumeMinM3 != null && latestMeasurement?.volumeMaxM3 != null) {
+      <div class="text-xs text-muted mt-1">
+        Faixa admissível: {{ latestMeasurement!.volumeMinM3 | number:'1.0-0' }}–{{ latestMeasurement!.volumeMaxM3 | number:'1.0-0' }} m³
+      </div>
+    }
+    @if (availableCapacityM3 != null) {
+      <div class="text-xs text-muted mt-1">
+        {{ availableCapacityM3 | number:'1.0-0' }} m³ disponíveis · cobertura {{ coveragePct != null ? coveragePct + '%' : '--' }}
+      </div>
+    }
+
     <div class="progress-bar mt-2 mb-3">
       <div class="progress-track" style="height: 8px; border-radius: 4px; overflow: hidden; background: var(--color-bg-app); box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);">
         <div class="progress-fill" 
@@ -36,7 +47,7 @@
     
     <div class="measurement-info d-flex align-center justify-between mt-2">
       <div class="time-info text-xs text-muted">
-        Última: {{ latestMeasurement ? (latestMeasurement.capturedAt | date:'shortTime') : '--' }}
+        Última: {{ latestMeasurement ? (latestMeasurement.capturedAt | date:'shortTime') : '--' }}{{ readingAge ? ' (' + readingAge + ')' : '' }}
       </div>
       <app-status-badge 
         *ngIf="latestMeasurement" 
@@ -45,9 +56,9 @@
       </app-status-badge>
     </div>
     
-    <div class="alert-info text-xs mt-2 d-flex align-center gap-2" *ngIf="latestAttemptFailed">
+    <div class="alert-info text-xs mt-2 d-flex align-center gap-2" *ngIf="latestUnsuccessfulAttempt">
       <lucide-angular name="alert-triangle" size="14" class="text-warning"></lucide-angular>
-      <span class="text-warning font-medium">Última tentativa falhou</span>
+      <span class="text-warning font-medium">{{ latestUnsuccessfulAttempt!.reason || 'Última tentativa não teve sucesso.' }}</span>
     </div>
   </div>
 

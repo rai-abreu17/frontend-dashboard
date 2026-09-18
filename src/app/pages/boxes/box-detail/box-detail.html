@@ -39,43 +39,116 @@
     <div class="tab-content">
       @if (activeTab === 'geral') {
         <div class="grid-geral">
-          <!-- Main KPIs -->
-          <div class="card kpi-highlight d-flex flex-col justify-between">
-            <div>
-              <div class="text-muted font-medium">Volume Atual Estimado</div>
-              <div class="text-4xl font-bold mt-2">
-                {{ (vm.latestMeasurement?.volumeM3 || 0) | number:'1.0-0' }} <span class="text-lg text-muted">m³</span>
+          <div class="d-flex flex-col gap-6">
+            <!-- Main KPIs -->
+            <div class="card kpi-highlight d-flex flex-col justify-between">
+              <div>
+                <div class="text-muted font-medium">Volume Atual Estimado</div>
+                <div class="text-4xl font-bold mt-2">
+                  {{ (vm.latestMeasurement?.volumeM3 || 0) | number:'1.0-0' }} <span class="text-lg text-muted">m³</span>
+                </div>
+                @if (vm.latestMeasurement?.volumeMinM3 != null && vm.latestMeasurement?.volumeMaxM3 != null) {
+                  <div class="text-sm text-muted mt-1">
+                    Faixa admissível: {{ vm.latestMeasurement!.volumeMinM3 | number:'1.0-0' }}–{{ vm.latestMeasurement!.volumeMaxM3 | number:'1.0-0' }} m³
+                  </div>
+                }
+                @if (vm.latestMeasurement?.conditionalVolumeMinM3 != null && vm.latestMeasurement?.conditionalVolumeMaxM3 != null) {
+                  <div class="text-xs text-light mt-1">
+                    Faixa condicional (com hipóteses declaradas): {{ vm.latestMeasurement!.conditionalVolumeMinM3 | number:'1.0-0' }}–{{ vm.latestMeasurement!.conditionalVolumeMaxM3 | number:'1.0-0' }} m³
+                  </div>
+                }
+              </div>
+              <div class="mt-4 text-sm text-muted d-flex justify-between">
+                <span>Capacidade total: {{ vm.box.maxVolumeCapacityM3 | number:'1.0-0' }} m³</span>
+                <span>
+                  {{ ((vm.latestMeasurement?.volumeM3 || 0) / vm.box.maxVolumeCapacityM3) * 100 | number:'1.0-1' }}%
+                </span>
+              </div>
+              <div class="progress-bar mt-2">
+                <div class="progress-fill" [style.width]="((vm.latestMeasurement?.volumeM3 || 0) / vm.box.maxVolumeCapacityM3) * 100 + '%'"></div>
               </div>
             </div>
-            <div class="mt-4 text-sm text-muted d-flex justify-between">
-              <span>Capacidade total: {{ vm.box.maxVolumeCapacityM3 | number:'1.0-0' }} m³</span>
-              <span>
-                {{ ((vm.latestMeasurement?.volumeM3 || 0) / vm.box.maxVolumeCapacityM3) * 100 | number:'1.0-1' }}%
-              </span>
-            </div>
-            <div class="progress-bar mt-2">
-              <div class="progress-fill" [style.width]="((vm.latestMeasurement?.volumeM3 || 0) / vm.box.maxVolumeCapacityM3) * 100 + '%'"></div>
+
+            <!-- Rejected readings -->
+            <div class="card">
+              <h3 class="font-bold text-sm mb-3 d-flex align-center gap-2">
+                <lucide-angular name="alert-triangle" size="16" class="text-warning"></lucide-angular>
+                Leituras Rejeitadas
+              </h3>
+              @if (vm.rejectedAttempts.length > 0) {
+                <div class="panel-list">
+                  @for (attempt of vm.rejectedAttempts; track attempt.id) {
+                    <div class="panel-item">
+                      <div class="d-flex justify-between align-center mb-1">
+                        <span class="badge text-xs font-bold" [ngClass]="attempt.status === 'FAILED' ? 'bg-danger-subtle text-danger' : 'bg-warning-subtle text-warning'">{{ attempt.status === 'FAILED' ? 'INVÁLIDA' : 'NÃO CONCLUSIVA' }}</span>
+                        <span class="text-xs text-muted">{{ attempt.startedAt | date:'dd/MM/yyyy HH:mm' }}</span>
+                      </div>
+                      <p class="text-sm text-muted m-0">{{ attempt.reason }}</p>
+                    </div>
+                  }
+                </div>
+              } @else {
+                <p class="text-sm text-muted m-0">Nenhuma divergência acima do limite acordado foi observada nesta janela.</p>
+              }
             </div>
           </div>
-          
-          <div class="card flex-center text-muted flex-col">
-            <lucide-angular name="box" size="48" class="mb-4 opacity-50"></lucide-angular>
-            <p>Visualização 3D em desenvolvimento</p>
+
+          <!-- Coverage / region map -->
+          <div class="card">
+            <div class="d-flex justify-between align-center mb-3">
+              <h3 class="font-bold text-sm m-0">Cobertura da Medição</h3>
+              <span class="text-sm font-bold text-primary">{{ vm.latestMeasurement?.coverageRatio != null ? (vm.latestMeasurement!.coverageRatio! * 100 | number:'1.0-0') + '%' : '--' }}</span>
+            </div>
+            <div class="region-map">
+              @for (observed of regionCells(vm.latestMeasurement); track $index) {
+                <div class="region-cell" [class.observed]="observed"></div>
+              }
+            </div>
+            <p class="text-xs text-muted mt-3 mb-0">Mapa simulado das regiões observadas (azul) e não observadas (cinza) na varredura mais recente.</p>
+
+            <div class="flex-center text-muted flex-col mt-6 pt-6 placeholder-3d">
+              <lucide-angular name="box" size="40" class="mb-2 opacity-50"></lucide-angular>
+              <p class="text-sm m-0">Visualização 3D em desenvolvimento</p>
+            </div>
           </div>
         </div>
       }
-      
+
       @if (activeTab === 'historico') {
-        <div class="card">
-          <h3 class="font-bold mb-4">Histórico Recente</h3>
-          <p class="text-muted">A interface de ciclos de material será renderizada aqui.</p>
+        <div class="card table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Data/Hora</th>
+                <th>Tipo</th>
+                <th>Descrição</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of historyRows; track row.occurredAt + row.description) {
+                <tr>
+                  <td class="text-muted">{{ row.occurredAt | date:'dd/MM/yyyy HH:mm' }}</td>
+                  <td class="font-medium">{{ row.kind }}</td>
+                  <td>{{ row.description }}</td>
+                </tr>
+              } @empty {
+                <tr><td colspan="3" class="text-center text-muted p-8">Nenhum registro de histórico para este box.</td></tr>
+              }
+            </tbody>
+          </table>
         </div>
       }
 
       @if (activeTab === 'tendencia') {
         <div class="card">
           <h3 class="font-bold mb-4">Evolução do Volume</h3>
-          <p class="text-muted">O gráfico de evolução das últimas leituras será renderizado aqui.</p>
+          @if (vm.measurements.length > 1) {
+            <div class="chart-container" style="height: 320px;">
+              <canvas baseChart [data]="volumeTrendChartData" [options]="volumeTrendChartOptions" [type]="'line'"></canvas>
+            </div>
+          } @else {
+            <p class="text-muted">Ainda não há leituras suficientes para traçar uma tendência deste box.</p>
+          }
         </div>
       }
     </div>

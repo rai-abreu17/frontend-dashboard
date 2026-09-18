@@ -1,0 +1,15 @@
+/* Estilos para a página de relatórios */
+.relatorios-page {
+  width: 100%;
+
+  select {
+    background-color: var(--color-bg-app);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-2) var(--spacing-3);
+    font-size: var(--text-sm);
+    color: var(--color-text-main);
+    outline: none;
+    cursor: pointer;
+  }
+}

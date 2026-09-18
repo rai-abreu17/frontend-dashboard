@@ -48,3 +48,7 @@ Thumbs.db
 
 # Design reference screenshots (not part of the app)
 /Referencia visual/
+
+# Playwright MCP debugging artifacts
+/.playwright-mcp/
+/*.png

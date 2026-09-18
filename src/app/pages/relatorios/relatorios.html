@@ -1,0 +1,123 @@
+<div class="relatorios-page">
+  <div class="page-header mb-6 d-flex justify-between align-center">
+    <div>
+      <h1 class="text-2xl font-bold">Relatórios e Exportações</h1>
+      <p class="text-muted">Extrair dados apresentados no protótipo para conferência e apresentação</p>
+    </div>
+    <div class="actions d-flex gap-3">
+      <button class="btn btn-outline d-flex align-center gap-2" title="Exportação real não disponível no protótipo">
+        <lucide-angular name="file-text" size="16"></lucide-angular>
+        Exportar CSV
+      </button>
+      <button class="btn btn-primary d-flex align-center gap-2" title="Exportação real não disponível no protótipo">
+        <lucide-angular name="file-text" size="16"></lucide-angular>
+        Gerar Relatório PDF
+      </button>
+    </div>
+  </div>
+
+  <div class="tabs d-flex gap-6 mb-6">
+    <button class="tab" [class.active]="activeTab === 'resumo'" (click)="setTab('resumo')">Resumo dos Boxes</button>
+    <button class="tab" [class.active]="activeTab === 'box'" (click)="setTab('box')">Histórico de um Box</button>
+    <button class="tab" [class.active]="activeTab === 'material'" (click)="setTab('material')">Histórico por Material</button>
+  </div>
+
+  @if (activeTab === 'resumo') {
+    <div class="card table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Box</th>
+            <th>Material Atual</th>
+            <th>Estado Operacional</th>
+            <th>Volume Atual</th>
+            <th>Estado da Medição</th>
+            <th>Data/Hora da Leitura</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of boxSummary$ | async; track row.box.id) {
+            <tr>
+              <td class="font-medium">{{ row.box.code }}</td>
+              <td>{{ row.material ? row.material.name : 'Sem material' }}</td>
+              <td>{{ row.box.operationalStatus }}</td>
+              <td>{{ row.latestMeasurement?.volumeM3 != null ? (row.latestMeasurement!.volumeM3 + ' m³') : '--' }}</td>
+              <td>{{ row.box.measurementStatus }}</td>
+              <td class="text-muted">{{ row.latestMeasurement ? (row.latestMeasurement.capturedAt | date:'dd/MM/yyyy HH:mm') : '--' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  @if (activeTab === 'box') {
+    <div class="filters-card card mb-6 d-flex align-center gap-3">
+      <label class="text-sm font-medium text-muted">Box:</label>
+      <select (change)="onBoxSelect($event)">
+        <option value="">Selecione um box</option>
+        @for (box of boxes$ | async; track box.id) {
+          <option [value]="box.id">{{ box.code }}</option>
+        }
+      </select>
+    </div>
+    <div class="card table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Data/Hora</th>
+            <th>Tipo</th>
+            <th>Descrição</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of boxHistory$ | async; track row.occurredAt + row.description) {
+            <tr>
+              <td class="text-muted">{{ row.occurredAt | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td class="font-medium">{{ row.kind }}</td>
+              <td>{{ row.description }}</td>
+            </tr>
+          } @empty {
+            <tr><td colspan="3" class="text-center text-muted p-8">Selecione um box para ver o histórico.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  @if (activeTab === 'material') {
+    <div class="filters-card card mb-6 d-flex align-center gap-3">
+      <label class="text-sm font-medium text-muted">Material:</label>
+      <select (change)="onMaterialSelect($event)">
+        <option value="">Selecione um material</option>
+        @for (material of materials$ | async; track material.id) {
+          <option [value]="material.id">{{ material.name }}</option>
+        }
+      </select>
+    </div>
+    <div class="card table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Box</th>
+            <th>Primeiro Evento</th>
+            <th>Último Evento</th>
+            <th>Volume Relacionado</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of materialHistory$ | async; track row.box.id) {
+            <tr>
+              <td class="font-medium">{{ row.box.code }}</td>
+              <td class="text-muted">{{ row.firstEventAt | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td class="text-muted">{{ row.lastEventAt | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td>{{ row.latestVolumeM3 != null ? (row.latestVolumeM3 + ' m³') : '--' }}</td>
+            </tr>
+          } @empty {
+            <tr><td colspan="4" class="text-center text-muted p-8">Selecione um material para ver os boxes utilizados.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

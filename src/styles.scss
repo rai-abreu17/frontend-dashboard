@@ -232,3 +232,179 @@ $spacing-scale: 1, 2, 3, 4, 5, 6, 8, 10;
   letter-spacing: 0.02em;
   text-transform: uppercase;
 }
+
+/* Segmented control (period/view-mode selector), used on dashboard, historico, etc. */
+.period-selector {
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  padding: var(--spacing-1);
+  box-shadow: var(--shadow-sm);
+
+  .btn-period {
+    padding: var(--spacing-2) var(--spacing-5);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+      color: var(--color-text-main);
+    }
+
+    &.active {
+      background: var(--color-primary-light);
+      color: var(--color-primary);
+      font-weight: 600;
+      box-shadow: 0 2px 4px rgba(59, 130, 246, 0.1);
+    }
+  }
+}
+
+/* Panel list (timeline-style item list), used on dashboard, historico, etc. */
+.panel-card {
+  .panel-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-4);
+  }
+
+  .panel-item {
+    padding: var(--spacing-3) 0;
+    border-bottom: 1px solid var(--color-border);
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background-color: var(--color-bg-app);
+      border-radius: var(--radius-sm);
+      padding-left: var(--spacing-2);
+      padding-right: var(--spacing-2);
+      margin-left: calc(var(--spacing-2) * -1);
+      margin-right: calc(var(--spacing-2) * -1);
+      border-bottom-color: transparent;
+    }
+
+    &:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+  }
+}
+
+/* Data table, used on materiais, historico, relatorios, validacao, etc. */
+.table-container {
+  overflow-x: auto;
+  padding: 0;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+
+  th {
+    padding: var(--spacing-4) var(--spacing-5);
+    background-color: var(--color-bg-app);
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    font-weight: var(--font-bold);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  td {
+    padding: var(--spacing-4) var(--spacing-5);
+    border-bottom: 1px solid var(--color-border);
+    color: var(--color-text-main);
+    font-size: var(--text-sm);
+  }
+
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  tbody tr:hover {
+    background-color: #f8fafc;
+  }
+}
+
+/* Buttons, used across every page */
+.btn {
+  padding: var(--spacing-2) var(--spacing-4);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  background: none;
+
+  &.btn-primary {
+    background-color: var(--color-primary);
+    color: white;
+
+    &:hover {
+      background-color: var(--color-primary-hover);
+    }
+  }
+
+  &.btn-outline {
+    background-color: transparent;
+    border: 1px solid var(--color-border);
+    color: var(--color-text-main);
+
+    &:hover {
+      background-color: var(--color-bg-app);
+    }
+  }
+}
+
+.btn-icon {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: var(--spacing-1);
+  border-radius: var(--radius-sm);
+  display: inline-flex;
+
+  &:hover {
+    color: var(--color-primary);
+    background-color: var(--color-bg-app);
+  }
+}
+
+/* Filter bar container, used on boxes/historico/relatorios */
+.filters-card {
+  padding: var(--spacing-3) var(--spacing-4);
+}
+
+/* Tab strip, used on box-detail/relatorios */
+.tabs {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.tab {
+  background: none;
+  border: none;
+  padding: var(--spacing-3) 0;
+  font-size: var(--text-base);
+  font-weight: var(--font-medium);
+  color: var(--color-text-muted);
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  margin-bottom: -1px;
+
+  &:hover {
+    color: var(--color-text-main);
+  }
+
+  &.active {
+    color: var(--color-primary);
+    border-bottom-color: var(--color-primary);
+  }
+}

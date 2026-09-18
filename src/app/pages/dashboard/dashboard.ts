@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { BoxService } from '../../core/services/box.service';
 import { MaterialService } from '../../core/services/material.service';
 import { MeasurementService } from '../../core/services/measurement.service';
+import { AcquisitionAttemptService } from '../../core/services/acquisition-attempt.service';
+import { EventService } from '../../core/services/event.service';
 import { BoxCardComponent } from '../../shared/components/box-card/box-card';
 import { KpiCardComponent } from '../../shared/components/kpi-card/kpi-card';
 import { combineLatest, Observable } from 'rxjs';
@@ -10,14 +12,53 @@ import { map } from 'rxjs/operators';
 import { Box } from '../../core/models/box.model';
 import { Material } from '../../core/models/material.model';
 import { Measurement } from '../../core/models/measurement.model';
+import { AcquisitionAttempt } from '../../core/models/operational-event.model';
 import { LucideAngularModule } from 'lucide-angular';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartOptions, ChartType } from 'chart.js';
+
+const EVENT_ICON_BY_TYPE: Record<string, string> = {
+  LEITURA_VOLUMETRICA: 'activity',
+  FALHA_INCONCLUSAO: 'alert-triangle',
+  INICIO_RECEBIMENTO: 'arrow-down',
+  MUDANCA_ARMAZENADO: 'box',
+  INICIO_RETIRADA: 'arrow-up',
+  FIM_RETIRADA: 'arrow-up',
+  INICIO_LIMPEZA: 'check-square',
+  FIM_LIMPEZA: 'check-square',
+  MATERIAL_ALTERADO: 'package',
+  RECALIBRACAO_SIMULADA: 'settings',
+  IMPORTACAO_LEGADO: 'file-text',
+};
+
+function relativeTime(dateIso: string): string {
+  const minutes = Math.floor((Date.now() - new Date(dateIso).getTime()) / (1000 * 60));
+  if (minutes < 1) return 'agora';
+  if (minutes < 60) return `Há ${minutes} min`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `Há ${hours}h`;
+  const days = Math.floor(hours / 24);
+  return `Há ${days}d`;
+}
+
+function computeTrend(measurementsDesc: Measurement[]): string | undefined {
+  if (measurementsDesc.length < 2) return undefined;
+  const [latest, previous] = measurementsDesc;
+  if (latest.volumeM3 == null || previous.volumeM3 == null) return undefined;
+
+  const diff = latest.volumeM3 - previous.volumeM3;
+  const hours = (new Date(latest.capturedAt).getTime() - new Date(previous.capturedAt).getTime()) / (1000 * 60 * 60);
+  const hoursLabel = hours < 1 ? 'na última hora' : `nas últimas ${Math.round(hours)}h`;
+
+  if (Math.abs(diff) < 20) return 'Estável';
+  return `${diff > 0 ? '+' : ''}${Math.round(diff)} m³ ${hoursLabel}`;
+}
 
 interface BoxViewModel {
   box: Box;
   material?: Material;
   latestMeasurement?: Measurement;
+  latestUnsuccessfulAttempt?: AcquisitionAttempt;
   trend?: string;
 }
 
@@ -30,21 +71,11 @@ interface BoxViewModel {
 export class Dashboard implements OnInit {
   viewModels$: Observable<BoxViewModel[]> | undefined;
   kpiStats$: Observable<any> | undefined;
-  
+  pendingAlerts$: Observable<{ title: string; time: string; type: 'danger' | 'warning' }[]> | undefined;
+  recentActivities$: Observable<{ text: string; time: string; icon: string }[]> | undefined;
+
   selectedPeriod: string = '7d';
 
-  // Mock data for side panels
-  pendingAlerts = [
-    { title: 'Box 02 - Calibração Necessária', time: 'Há 2h', type: 'calibration' },
-    { title: 'Box 07 - Leitura Inválida', time: 'Há 15 min', type: 'danger' }
-  ];
-
-  recentActivities = [
-    { text: 'Box 03 entrou em Limpeza', time: '10:45', icon: 'check-square' },
-    { text: 'Novo material "Soja" em Box 01', time: '09:30', icon: 'package' },
-    { text: 'Leitura automática finalizada', time: '09:15', icon: 'history' }
-  ];
-  
   risksAndPredictions = [
     { box: 'BOX-02', severity: 'danger', title: 'Capacidade crítica em 5h40', confidence: '91%', description: 'Tendência de atingir 90% da capacidade.' },
     { box: 'BOX-05', severity: 'warning', title: 'Ritmo de retirada lento', confidence: '82%', description: '+2h15 em relação à tendência normal.' },
@@ -219,30 +250,36 @@ export class Dashboard implements OnInit {
   constructor(
     private boxService: BoxService,
     private materialService: MaterialService,
-    private measurementService: MeasurementService
+    private measurementService: MeasurementService,
+    private acquisitionAttemptService: AcquisitionAttemptService,
+    private eventService: EventService
   ) {}
 
   ngOnInit() {
     this.viewModels$ = combineLatest([
       this.boxService.getBoxes(),
       this.materialService.getMaterials(),
-      this.measurementService.getAllMeasurements()
+      this.measurementService.getAllMeasurements(),
+      this.acquisitionAttemptService.getAll()
     ]).pipe(
-      map(([boxes, materials, measurements]) => {
-        return boxes.map((box, index) => {
+      map(([boxes, materials, measurements, attempts]) => {
+        return boxes.map(box => {
           const material = materials.find(m => m.id === box.currentMaterialId);
           const boxMeasurements = measurements.filter(m => m.boxId === box.id);
           boxMeasurements.sort((a, b) => new Date(b.capturedAt).getTime() - new Date(a.capturedAt).getTime());
           const latestMeasurement = boxMeasurements.length > 0 ? boxMeasurements[0] : undefined;
 
-          // Mock trend for box card
-          const mockTrends = ['+320 m³ nas últimas 2h', '-150 m³ nas últimas 4h', 'Estável', '+50 m³ na última hora'];
-          const trend = mockTrends[index % mockTrends.length];
+          const latestUnsuccessfulAttempt = attempts
+            .filter(a => a.boxId === box.id && a.status !== 'SUCCESS')
+            .sort((a, b) => new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime())[0];
+
+          const trend = computeTrend(boxMeasurements);
 
           return {
             box,
             material,
             latestMeasurement,
+            latestUnsuccessfulAttempt,
             trend
           };
         });
@@ -250,6 +287,25 @@ export class Dashboard implements OnInit {
     );
 
     this.viewModels$.subscribe(vms => this.updateOccupationChart(vms));
+
+    this.pendingAlerts$ = this.viewModels$.pipe(
+      map(vms => vms
+        .filter(vm => !!vm.latestUnsuccessfulAttempt)
+        .map(vm => ({
+          title: `${vm.box.code} - ${vm.latestUnsuccessfulAttempt!.status === 'FAILED' ? 'Leitura Inválida' : 'Não Conclusiva'}`,
+          time: relativeTime(vm.latestUnsuccessfulAttempt!.startedAt),
+          type: vm.latestUnsuccessfulAttempt!.status === 'FAILED' ? 'danger' as const : 'warning' as const
+        }))
+      )
+    );
+
+    this.recentActivities$ = this.eventService.getAllEvents().pipe(
+      map(events => events.slice(0, 5).map(e => ({
+        text: e.title,
+        time: relativeTime(e.occurredAt),
+        icon: EVENT_ICON_BY_TYPE[e.type] ?? 'activity'
+      })))
+    );
 
     this.kpiStats$ = this.viewModels$.pipe(
       map(vms => {

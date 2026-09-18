@@ -32,10 +32,11 @@
   <div class="box-grid">
     @for (vm of viewModels$ | async; track vm.box.id) {
       <a [routerLink]="['/boxes', vm.box.id]" class="card-link">
-        <app-box-card 
-          [box]="vm.box" 
-          [material]="vm.material" 
-          [latestMeasurement]="vm.latestMeasurement">
+        <app-box-card
+          [box]="vm.box"
+          [material]="vm.material"
+          [latestMeasurement]="vm.latestMeasurement"
+          [latestUnsuccessfulAttempt]="vm.latestUnsuccessfulAttempt">
         </app-box-card>
       </a>
     }

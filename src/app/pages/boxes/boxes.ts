@@ -5,18 +5,21 @@ import { RouterLink } from '@angular/router';
 import { BoxService } from '../../core/services/box.service';
 import { MaterialService } from '../../core/services/material.service';
 import { MeasurementService } from '../../core/services/measurement.service';
+import { AcquisitionAttemptService } from '../../core/services/acquisition-attempt.service';
 import { BoxCardComponent } from '../../shared/components/box-card/box-card';
 import { combineLatest, Observable, BehaviorSubject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Box } from '../../core/models/box.model';
 import { Material } from '../../core/models/material.model';
 import { Measurement } from '../../core/models/measurement.model';
+import { AcquisitionAttempt } from '../../core/models/operational-event.model';
 import { LucideAngularModule } from 'lucide-angular';
 
 interface BoxViewModel {
   box: Box;
   material?: Material;
   latestMeasurement?: Measurement;
+  latestUnsuccessfulAttempt?: AcquisitionAttempt;
 }
 
 @Component({
@@ -34,22 +37,27 @@ export class Boxes implements OnInit {
   constructor(
     private boxService: BoxService,
     private materialService: MaterialService,
-    private measurementService: MeasurementService
+    private measurementService: MeasurementService,
+    private acquisitionAttemptService: AcquisitionAttemptService
   ) {}
 
   ngOnInit() {
     const rawData$ = combineLatest([
       this.boxService.getBoxes(),
       this.materialService.getMaterials(),
-      this.measurementService.getAllMeasurements()
+      this.measurementService.getAllMeasurements(),
+      this.acquisitionAttemptService.getAll()
     ]).pipe(
-      map(([boxes, materials, measurements]) => {
+      map(([boxes, materials, measurements, attempts]) => {
         return boxes.map(box => {
           const material = materials.find(m => m.id === box.currentMaterialId);
           const boxMeasurements = measurements.filter(m => m.boxId === box.id);
           boxMeasurements.sort((a, b) => new Date(b.capturedAt).getTime() - new Date(a.capturedAt).getTime());
           const latestMeasurement = boxMeasurements.length > 0 ? boxMeasurements[0] : undefined;
-          return { box, material, latestMeasurement };
+          const latestUnsuccessfulAttempt = attempts
+            .filter(a => a.boxId === box.id && a.status !== 'SUCCESS')
+            .sort((a, b) => new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime())[0];
+          return { box, material, latestMeasurement, latestUnsuccessfulAttempt };
         });
       })
     );

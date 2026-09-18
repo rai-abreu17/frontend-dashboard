@@ -1,0 +1,137 @@
+<div class="historico-page">
+  <div class="page-header mb-6 d-flex justify-between align-center">
+    <div>
+      <h1 class="text-2xl font-bold">Histórico Geral</h1>
+      <p class="text-muted">Linha do tempo pesquisável de medições e eventos operacionais</p>
+    </div>
+    <button class="btn btn-outline d-flex align-center gap-2" title="Exportação real não disponível no protótipo">
+      <lucide-angular name="file-text" size="16"></lucide-angular>
+      Exportar CSV
+    </button>
+  </div>
+
+  <div class="filters-card card mb-6">
+    <div class="filters-grid">
+      <select (change)="onPeriodChange($event)">
+        <option value="1d">Hoje</option>
+        <option value="7d" selected>7 dias</option>
+        <option value="30d">30 dias</option>
+        <option value="all">Tudo</option>
+      </select>
+
+      <select (change)="onBoxChange($event)">
+        <option value="todos">Todos os boxes</option>
+        @for (box of boxes$ | async; track box.id) {
+          <option [value]="box.id">{{ box.code }}</option>
+        }
+      </select>
+
+      <select (change)="onMaterialChange($event)">
+        <option value="todos">Todos os materiais</option>
+        @for (material of materials$ | async; track material.id) {
+          <option [value]="material.id">{{ material.name }}</option>
+        }
+      </select>
+
+      <select (change)="onTypeChange($event)">
+        <option value="todos">Todos os tipos de evento</option>
+        @for (opt of eventTypeOptions; track opt[0]) {
+          <option [value]="opt[0]">{{ opt[1] }}</option>
+        }
+      </select>
+
+      <select (change)="onOpStatusChange($event)">
+        <option value="todos">Todos os estados operacionais</option>
+        <option value="livre">Livre</option>
+        <option value="recebendo">Recebendo</option>
+        <option value="armazenado">Armazenado</option>
+        <option value="em_retirada">Em Retirada</option>
+        <option value="em_limpeza">Em Limpeza</option>
+        <option value="em_manutencao">Em Manutenção</option>
+      </select>
+
+      <select (change)="onMeasurementStatusChange($event)">
+        <option value="todos">Todos os estados de medição</option>
+        <option value="valida">Válida</option>
+        <option value="vencida">Vencida</option>
+        <option value="inconclusiva">Inconclusiva</option>
+        <option value="invalida">Inválida</option>
+        <option value="recalibracao_necessaria">Recalibração Necessária</option>
+        <option value="nao_instrumentado">Não Instrumentado</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="view-toggle-row mb-6 d-flex justify-between align-center">
+    <div class="period-selector bg-surface border rounded-md d-flex overflow-hidden">
+      <button class="btn-period" [class.active]="viewMode === 'timeline'" (click)="setViewMode('timeline')">Timeline</button>
+      <button class="btn-period" [class.active]="viewMode === 'tabela'" (click)="setViewMode('tabela')">Tabela</button>
+      <button class="btn-period" [class.active]="viewMode === 'grafico'" (click)="setViewMode('grafico')">Gráfico de Volume</button>
+    </div>
+  </div>
+
+  @if (viewMode === 'timeline') {
+    <div class="card panel-card">
+      <div class="panel-list">
+        @for (vm of filteredEvents$ | async; track vm.event.id) {
+          <div class="panel-item d-flex gap-3">
+            <div class="icon-container bg-primary-subtle text-primary">
+              <lucide-angular [name]="eventTypeIcons[vm.event.type] || 'activity'" size="16"></lucide-angular>
+            </div>
+            <div class="flex-1">
+              <div class="d-flex justify-between align-center">
+                <span class="badge text-xs font-bold bg-primary-subtle text-primary">{{ vm.box?.code || vm.event.boxId }}</span>
+                <span class="text-xs text-muted font-medium">{{ vm.event.occurredAt | date:'dd/MM/yyyy HH:mm' }}</span>
+              </div>
+              <p class="text-sm font-bold mt-2 mb-1">{{ eventTypeLabels[vm.event.type] || vm.event.type }}</p>
+              <p class="text-xs text-muted m-0">{{ vm.event.description }}</p>
+              @if (vm.material) {
+                <span class="text-xs font-medium mt-1" [style.color]="vm.material.displayColor">{{ vm.material.name }}</span>
+              }
+            </div>
+          </div>
+        } @empty {
+          <p class="text-muted text-center p-8">Nenhum evento encontrado com os filtros atuais.</p>
+        }
+      </div>
+    </div>
+  }
+
+  @if (viewMode === 'tabela') {
+    <div class="card table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Data/Hora</th>
+            <th>Box</th>
+            <th>Tipo de Evento</th>
+            <th>Material</th>
+            <th>Descrição</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (vm of filteredEvents$ | async; track vm.event.id) {
+            <tr>
+              <td class="text-muted">{{ vm.event.occurredAt | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td class="font-medium">{{ vm.box?.code || vm.event.boxId }}</td>
+              <td>{{ eventTypeLabels[vm.event.type] || vm.event.type }}</td>
+              <td>{{ vm.material ? vm.material.name : '—' }}</td>
+              <td class="text-muted">{{ vm.event.description }}</td>
+            </tr>
+          } @empty {
+            <tr><td colspan="5" class="text-center text-muted p-8">Nenhum evento encontrado com os filtros atuais.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  @if (viewMode === 'grafico') {
+    <div class="card panel-card">
+      <h3 class="font-bold text-lg mb-4">Volume por Box (boxes presentes no filtro atual)</h3>
+      <div class="chart-container" style="height: 320px;">
+        <canvas baseChart [data]="volumeChartData" [options]="volumeChartOptions" [type]="'bar'"></canvas>
+      </div>
+    </div>
+  }
+</div>
