@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { Box } from '../../../core/models/box.model';
 import { Measurement } from '../../../core/models/measurement.model';
 import { Material } from '../../../core/models/material.model';
@@ -9,7 +10,7 @@ import { LucideAngularModule } from 'lucide-angular';
 
 @Component({
   selector: 'app-box-card',
-  imports: [CommonModule, StatusBadgeComponent, LucideAngularModule],
+  imports: [CommonModule, RouterLink, StatusBadgeComponent, LucideAngularModule],
   templateUrl: './box-card.html',
   styleUrl: './box-card.scss',
   providers: [DatePipe]

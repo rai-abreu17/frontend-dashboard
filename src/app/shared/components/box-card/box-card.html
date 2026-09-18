@@ -63,9 +63,9 @@
   </div>
 
   <div class="box-footer mt-4 pt-4">
-    <button class="btn-link d-flex align-center gap-1 text-sm font-medium">
+    <a [routerLink]="['/boxes', box.id]" class="btn-link d-flex align-center gap-1 text-sm font-medium" style="text-decoration: none;">
       Ver detalhes
       <lucide-angular name="chevron-right" size="16"></lucide-angular>
-    </button>
+    </a>
   </div>
 </div>
