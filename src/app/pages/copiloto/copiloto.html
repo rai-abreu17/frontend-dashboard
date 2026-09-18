@@ -1,4 +1,4 @@
-<div class="copiloto-page">
+<div class="copiloto-page" [class.is-chatting]="hasConversation()">
   <div class="copilot-header mb-4">
     <div class="d-flex align-center gap-3">
       <h1 class="text-2xl font-bold m-0 d-flex align-center gap-2">
@@ -18,69 +18,87 @@
   <div class="card copilot-card d-flex flex-col">
     @if (!hasConversation()) {
       <div class="copilot-idle">
-        <section class="quick-actions" aria-label="Atalhos do Copiloto">
+        <section class="quick-actions mb-4" aria-label="Atalhos do Copiloto">
           @for (action of quickActions; track action.title) {
             <button type="button" class="quick-action" (click)="send(action.example)">
-              <span class="icon-container bg-primary-subtle text-primary">
-                <lucide-angular [name]="action.icon" size="16"></lucide-angular>
-              </span>
-              <span class="quick-action-text">
+              <div class="icon-container bg-primary-subtle text-primary">
+                <lucide-angular [name]="action.icon" size="18"></lucide-angular>
+              </div>
+              <div class="quick-action-text">
                 <span class="quick-action-title">{{ action.title }}</span>
                 <span class="quick-action-desc">{{ action.description }}</span>
-              </span>
-              <lucide-angular name="chevron-right" size="14" class="quick-action-chevron"></lucide-angular>
+              </div>
+              <lucide-angular name="chevron-right" size="16" class="quick-action-chevron"></lucide-angular>
             </button>
           }
         </section>
 
         @if (operationalContext(); as ctx) {
-          <section class="context-panel">
-            <div class="context-header d-flex align-center justify-between">
-              <span class="context-title text-xs font-semibold text-muted">Contexto operacional</span>
-              @if (ctx.lastUpdateAt) {
-                <span class="context-updated text-xs text-muted d-flex align-center gap-1">
-                  <lucide-angular name="clock" size="12"></lucide-angular>
-                  Atualizado {{ ctx.lastUpdateAt | date:'dd/MM HH:mm' }}
-                </span>
-              }
+          <section class="context-panel mb-4">
+            <div class="context-col">
+              <div class="context-header d-flex justify-between align-center mb-3">
+                <span class="context-title text-xs font-semibold text-muted">Situação atual</span>
+              </div>
+
+              <div class="context-stats">
+                <div class="context-stat stat-success">
+                  <span class="context-stat-value">{{ ctx.freeCount }}</span>
+                  <span class="context-stat-label">livres</span>
+                </div>
+                <div class="context-stat stat-neutral">
+                  <span class="context-stat-value">{{ ctx.occupiedCount }}</span>
+                  <span class="context-stat-label">ocupados</span>
+                </div>
+                <div class="context-stat stat-warning">
+                  <span class="context-stat-value">{{ ctx.attentionCount }}</span>
+                  <span class="context-stat-label">atenção</span>
+                </div>
+              </div>
+
+              <a class="nav-action text-xs font-medium mt-auto pt-4 d-flex align-center gap-1" routerLink="/boxes">
+                Ver todos os boxes <lucide-angular name="arrow-right" size="12"></lucide-angular>
+              </a>
             </div>
 
-            <div class="context-stats">
-              <div class="context-stat">
-                <span class="context-stat-value text-success">{{ ctx.freeCount }}</span>
-                <span class="context-stat-label">livres</span>
-              </div>
-              <div class="context-stat">
-                <span class="context-stat-value">{{ ctx.occupiedCount }}</span>
-                <span class="context-stat-label">ocupados</span>
-              </div>
-              <div class="context-stat">
-                <span class="context-stat-value" [class.text-warning]="ctx.attentionCount > 0">{{ ctx.attentionCount }}</span>
-                <span class="context-stat-label">exigem atenção</span>
-              </div>
-            </div>
-
-            @if (ctx.recentValidated.length > 0) {
-              <div class="context-recent">
-                @for (m of ctx.recentValidated; track m.measurementId) {
-                  <div class="context-recent-row">
-                    <span class="font-medium text-sm">{{ m.boxCode }}</span>
-                    <span class="text-sm text-muted">{{ m.volumeM3 != null ? (m.volumeM3 | number:'1.0-0') + ' m³' : 'sem valor' }}</span>
-                    <span class="tag-id text-xs">{{ m.measurementId }}</span>
-                    <span class="text-xs text-muted">{{ m.capturedAt | date:'dd/MM HH:mm' }}</span>
-                  </div>
+            <div class="context-col context-recent-col">
+              <div class="context-header d-flex justify-between align-center mb-3">
+                <span class="context-title text-xs font-semibold text-muted">Últimas medições validadas</span>
+                @if (ctx.lastUpdateAt) {
+                  <span class="context-updated text-xs text-muted d-flex align-center gap-1">
+                    <lucide-angular name="clock" size="12"></lucide-angular>
+                    {{ ctx.lastUpdateAt | date:'HH:mm' }}
+                  </span>
                 }
               </div>
-            }
+
+              @if (ctx.recentValidated.length > 0) {
+                <div class="context-recent-list">
+                  @for (m of ctx.recentValidated; track m.measurementId) {
+                    <div class="context-recent-row">
+                      <span class="recent-box font-medium text-sm">{{ m.boxCode }}</span>
+                      <span class="recent-vol text-sm">{{ m.volumeM3 != null ? (m.volumeM3 | number:'1.0-0') + ' m³' : '--' }}</span>
+                      <span class="recent-id tag-id text-xs" title="Fonte da medição">{{ m.measurementId }}</span>
+                      <span class="recent-time text-xs text-muted">{{ m.capturedAt | date:'HH:mm' }}</span>
+                    </div>
+                  }
+                </div>
+              } @else {
+                <p class="text-sm text-muted mb-0">Nenhuma medição recente.</p>
+              }
+
+              <a class="nav-action text-xs font-medium mt-auto pt-4 d-flex align-center gap-1" routerLink="/historico">
+                Ver histórico de medições <lucide-angular name="arrow-right" size="12"></lucide-angular>
+              </a>
+            </div>
           </section>
         }
 
         <section class="suggested-list">
-          <span class="context-title text-xs font-semibold text-muted">Perguntas sugeridas</span>
-          <div class="suggested-rows">
+          <span class="context-title text-xs font-semibold text-muted mb-2 d-block">Perguntas sugeridas</span>
+          <div class="suggested-grid">
             @for (q of suggestedQueries; track q) {
               <button type="button" class="suggested-row" (click)="send(q)">
-                <lucide-angular name="chevron-right" size="12"></lucide-angular>
+                <lucide-angular name="chevron-right" size="14"></lucide-angular>
                 <span>{{ q }}</span>
               </button>
             }
