@@ -1,0 +1,407 @@
+.copiloto-page {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.copilot-header .badge {
+  cursor: help;
+}
+
+.copilot-card {
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ---------- Estado inicial (antes da primeira pergunta) ---------- */
+
+.copilot-idle {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-5);
+  padding-bottom: var(--spacing-4);
+  margin-bottom: var(--spacing-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.quick-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-1);
+}
+
+.quick-action {
+  flex: 1 1 240px;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-2) var(--spacing-2);
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-md);
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s;
+
+  &:hover {
+    background-color: var(--color-bg-app);
+
+    .quick-action-chevron {
+      color: var(--color-primary);
+      transform: translateX(2px);
+    }
+  }
+}
+
+.quick-action-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.quick-action-title {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-text-main);
+}
+
+.quick-action-desc {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.quick-action-chevron {
+  margin-left: auto;
+  color: var(--color-text-light);
+  flex-shrink: 0;
+  transition: transform 0.15s, color 0.15s;
+}
+
+/* ---------- Contexto operacional ---------- */
+
+.context-panel {
+  background-color: var(--color-bg-app);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-4);
+}
+
+.context-title {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.context-stats {
+  display: flex;
+  gap: var(--spacing-6);
+  margin-top: var(--spacing-3);
+}
+
+.context-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.context-stat-value {
+  font-size: var(--text-xl);
+  font-weight: var(--font-bold);
+  color: var(--color-text-main);
+}
+
+.context-stat-label {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.context-recent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+  margin-top: var(--spacing-4);
+  padding-top: var(--spacing-3);
+  border-top: 1px solid var(--color-border-hover);
+}
+
+.context-recent-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+
+  > :last-child {
+    margin-left: auto;
+  }
+}
+
+/* ---------- Perguntas sugeridas ---------- */
+
+.suggested-rows {
+  display: flex;
+  flex-direction: column;
+  margin-top: var(--spacing-2);
+}
+
+.suggested-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-1);
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  text-align: left;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: color 0.15s, background-color 0.15s;
+
+  lucide-angular {
+    flex-shrink: 0;
+    color: var(--color-text-light);
+    transition: color 0.15s;
+  }
+
+  &:hover {
+    color: var(--color-primary);
+    background-color: var(--color-bg-app);
+
+    lucide-angular {
+      color: var(--color-primary);
+    }
+  }
+}
+
+/* ---------- Log de conversa ---------- */
+
+.chat-log {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: var(--spacing-2);
+  margin-bottom: var(--spacing-4);
+}
+
+.chat-row {
+  display: flex;
+  margin-bottom: var(--spacing-4);
+
+  &.user {
+    justify-content: flex-end;
+  }
+
+  &.assistant {
+    align-items: flex-start;
+    gap: var(--spacing-3);
+  }
+}
+
+.user-pill {
+  max-width: 70%;
+  padding: var(--spacing-2) var(--spacing-4);
+  border-radius: var(--radius-md);
+  background-color: var(--color-primary);
+  color: #fff;
+  font-size: var(--text-sm);
+  line-height: 1.4;
+}
+
+.assistant-avatar {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+}
+
+.assistant-content {
+  max-width: 620px;
+  min-width: 0;
+}
+
+.assistant-content-wide {
+  max-width: 100%;
+  width: 100%;
+}
+
+.assistant-text,
+.assistant-headline {
+  color: var(--color-text-main);
+}
+
+/* ---------- Blocos de resposta estruturada ---------- */
+
+.box-rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.box-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--spacing-2) var(--spacing-4);
+  padding: var(--spacing-3);
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg-app);
+}
+
+.box-row-main {
+  flex: 1 1 auto;
+  min-width: 180px;
+}
+
+.box-row-meta {
+  flex: 1 1 auto;
+  white-space: nowrap;
+}
+
+.box-row-link {
+  color: var(--color-primary);
+  flex-shrink: 0;
+
+  &:hover {
+    color: var(--color-primary-hover);
+  }
+}
+
+.comparison-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-3);
+}
+
+.comparison-col {
+  padding: var(--spacing-3) var(--spacing-4);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-bg-app);
+}
+
+.comparison-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+}
+
+.measurement-card {
+  padding: var(--spacing-3) var(--spacing-4);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-bg-app);
+}
+
+.rejection-row {
+  padding: var(--spacing-3) var(--spacing-4);
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg-app);
+  border-left: 3px solid var(--color-warning);
+
+  &.rejection-failed {
+    border-left-color: var(--color-danger);
+  }
+
+  & + .rejection-row {
+    margin-top: var(--spacing-2);
+  }
+}
+
+.tag-id {
+  font-family: 'SF Mono', Consolas, monospace;
+  background-color: var(--color-border);
+  color: var(--color-text-muted);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+}
+
+.no-evidence {
+  padding: var(--spacing-3) var(--spacing-4);
+  border-radius: var(--radius-md);
+  border: 1px dashed var(--color-border-hover);
+  background-color: var(--color-bg-app);
+}
+
+/* ---------- Fontes ---------- */
+
+.sources-label {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.source-chip {
+  background-color: var(--color-bg-app);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  font-family: 'SF Mono', Consolas, monospace;
+
+  &:hover {
+    color: var(--color-primary);
+    border-color: var(--color-primary);
+  }
+}
+
+/* ---------- Sugestões contextuais ---------- */
+
+.suggestion-chip {
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-bg-surface);
+  font-size: var(--text-xs);
+  font-weight: var(--font-medium);
+  color: var(--color-text-main);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background-color 0.15s;
+
+  &:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    background-color: var(--color-primary-light);
+  }
+}
+
+/* ---------- Composer ---------- */
+
+.composer {
+  padding-top: var(--spacing-3);
+  border-top: 1px solid var(--color-border);
+  align-items: center;
+}
+
+.composer-input {
+  flex: 1;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  font-size: var(--text-sm);
+  background-color: var(--color-bg-app);
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    background-color: var(--color-bg-surface);
+  }
+}
+
+.composer-send {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: var(--radius-full);
+  background-color: var(--color-primary);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s;
+
+  &:hover:not(:disabled) {
+    background-color: var(--color-primary-hover);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+}

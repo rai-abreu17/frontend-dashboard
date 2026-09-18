@@ -14,8 +14,8 @@ export const MOCK_MATERIALS: Material[] = [
 
 // 7 boxes grandes (17,5 x 47,63 m, ~833,45 m² de piso) + 3 boxes pequenos (11,5 x 47,62 m, ~547,70 m² de piso).
 // Dimensões reais, usadas só para a proporção visual da cena 3D — não alteram maxVolumeCapacityM3.
-const GRANDE = { widthM: 17.5, lengthM: 47.63, sizeClass: 'GRANDE' as const };
-const PEQUENO = { widthM: 11.5, lengthM: 47.62, sizeClass: 'PEQUENO' as const };
+const GRANDE = { widthM: 17.5, lengthM: 47.63, heightM: 16, sizeClass: 'GRANDE' as const };
+const PEQUENO = { widthM: 11.5, lengthM: 47.62, heightM: 16, sizeClass: 'PEQUENO' as const };
 
 export const MOCK_BOXES: Box[] = [
   { id: 'b1', code: 'BOX-01', name: 'Box 01', operationalStatus: 'RECEBENDO', measurementStatus: 'VALIDA', currentMaterialId: 'm1', lastMaterialId: null, latestValidMeasurementId: 'ms1', latestAttemptId: 'at1', instrumented: true, maxVolumeCapacityM3: 5000, ...GRANDE },

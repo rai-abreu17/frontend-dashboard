@@ -1,0 +1,259 @@
+<div class="copiloto-page">
+  <div class="copilot-header mb-4">
+    <div class="d-flex align-center gap-3">
+      <h1 class="text-2xl font-bold m-0 d-flex align-center gap-2">
+        <lucide-angular name="bot" size="22" class="text-primary"></lucide-angular>
+        Copiloto de IA
+      </h1>
+      <span
+        class="badge bg-success-subtle text-success text-xs font-semibold d-flex align-center gap-1"
+        title="Consulto apenas medições e registros já validados do terminal. Toda resposta cita a fonte usada, e eu digo quando não há evidência suficiente.">
+        <lucide-angular name="check-square" size="12"></lucide-angular>
+        Dados validados
+      </span>
+    </div>
+    <p class="text-sm text-muted mt-1 mb-0">Consulte medições, investigue ocorrências e compare o histórico operacional.</p>
+  </div>
+
+  <div class="card copilot-card d-flex flex-col">
+    @if (!hasConversation()) {
+      <div class="copilot-idle">
+        <section class="quick-actions" aria-label="Atalhos do Copiloto">
+          @for (action of quickActions; track action.title) {
+            <button type="button" class="quick-action" (click)="send(action.example)">
+              <span class="icon-container bg-primary-subtle text-primary">
+                <lucide-angular [name]="action.icon" size="16"></lucide-angular>
+              </span>
+              <span class="quick-action-text">
+                <span class="quick-action-title">{{ action.title }}</span>
+                <span class="quick-action-desc">{{ action.description }}</span>
+              </span>
+              <lucide-angular name="chevron-right" size="14" class="quick-action-chevron"></lucide-angular>
+            </button>
+          }
+        </section>
+
+        @if (operationalContext(); as ctx) {
+          <section class="context-panel">
+            <div class="context-header d-flex align-center justify-between">
+              <span class="context-title text-xs font-semibold text-muted">Contexto operacional</span>
+              @if (ctx.lastUpdateAt) {
+                <span class="context-updated text-xs text-muted d-flex align-center gap-1">
+                  <lucide-angular name="clock" size="12"></lucide-angular>
+                  Atualizado {{ ctx.lastUpdateAt | date:'dd/MM HH:mm' }}
+                </span>
+              }
+            </div>
+
+            <div class="context-stats">
+              <div class="context-stat">
+                <span class="context-stat-value text-success">{{ ctx.freeCount }}</span>
+                <span class="context-stat-label">livres</span>
+              </div>
+              <div class="context-stat">
+                <span class="context-stat-value">{{ ctx.occupiedCount }}</span>
+                <span class="context-stat-label">ocupados</span>
+              </div>
+              <div class="context-stat">
+                <span class="context-stat-value" [class.text-warning]="ctx.attentionCount > 0">{{ ctx.attentionCount }}</span>
+                <span class="context-stat-label">exigem atenção</span>
+              </div>
+            </div>
+
+            @if (ctx.recentValidated.length > 0) {
+              <div class="context-recent">
+                @for (m of ctx.recentValidated; track m.measurementId) {
+                  <div class="context-recent-row">
+                    <span class="font-medium text-sm">{{ m.boxCode }}</span>
+                    <span class="text-sm text-muted">{{ m.volumeM3 != null ? (m.volumeM3 | number:'1.0-0') + ' m³' : 'sem valor' }}</span>
+                    <span class="tag-id text-xs">{{ m.measurementId }}</span>
+                    <span class="text-xs text-muted">{{ m.capturedAt | date:'dd/MM HH:mm' }}</span>
+                  </div>
+                }
+              </div>
+            }
+          </section>
+        }
+
+        <section class="suggested-list">
+          <span class="context-title text-xs font-semibold text-muted">Perguntas sugeridas</span>
+          <div class="suggested-rows">
+            @for (q of suggestedQueries; track q) {
+              <button type="button" class="suggested-row" (click)="send(q)">
+                <lucide-angular name="chevron-right" size="12"></lucide-angular>
+                <span>{{ q }}</span>
+              </button>
+            }
+          </div>
+        </section>
+      </div>
+    } @else {
+      <div class="chat-log">
+        @for (message of messages(); track $index; let i = $index) {
+          @if (message.role === 'user') {
+            <div class="chat-row user">
+              <div class="user-pill">{{ message.text }}</div>
+            </div>
+          } @else {
+            <div class="chat-row assistant">
+              <div class="assistant-avatar icon-container bg-primary-subtle text-primary">
+                <lucide-angular name="bot" size="16"></lucide-angular>
+              </div>
+              <div class="assistant-content" [class.assistant-content-wide]="message.kind === 'boxes' || message.kind === 'comparison'">
+                @switch (message.kind) {
+                  @case ('boxes') {
+                    <p class="assistant-headline font-bold text-sm mb-2">{{ message.headline }}</p>
+                    <div class="box-rows">
+                      @for (b of message.boxes; track b.boxId) {
+                        <div class="box-row">
+                          <div class="box-row-main d-flex align-center gap-3">
+                            <app-status-badge [status]="b.operationalStatus" type="operational"></app-status-badge>
+                            <span class="font-semibold text-sm">{{ b.code }}</span>
+                            <span class="text-xs font-medium" [ngClass]="occupancyStatusClass(b.occupancyPct)">
+                              {{ b.occupancyPct != null ? b.occupancyPct + '% ocupado' : 'sem medição' }}
+                            </span>
+                          </div>
+                          <div class="box-row-meta text-xs text-muted">
+                            @if (b.availableM3 != null) {
+                              <span>{{ b.availableM3 | number:'1.0-0' }} m³ disponíveis</span>
+                            }
+                            @if (b.measurementAt) {
+                              <span> · Última medição: {{ b.measurementAt | date:'dd/MM HH:mm' }}</span>
+                            }
+                          </div>
+                          <a class="box-row-link text-xs font-medium d-flex align-center gap-1" [routerLink]="['/boxes', b.boxId]">
+                            Ver box
+                            <lucide-angular name="chevron-right" size="14"></lucide-angular>
+                          </a>
+                        </div>
+                      }
+                    </div>
+                  }
+                  @case ('comparison') {
+                    <p class="assistant-headline font-bold text-sm mb-2">{{ message.headline }}</p>
+                    <div class="comparison-grid">
+                      @for (b of message.boxes; track b.boxId) {
+                        <div class="comparison-col">
+                          <div class="d-flex align-center gap-2 mb-2">
+                            <span class="font-bold text-sm">{{ b.code }}</span>
+                            <app-status-badge [status]="b.operationalStatus" type="operational"></app-status-badge>
+                          </div>
+                          <div class="comparison-row">
+                            <span class="text-xs text-muted">Ocupação</span>
+                            <span class="font-semibold text-sm" [ngClass]="occupancyStatusClass(b.occupancyPct)">
+                              {{ b.occupancyPct != null ? b.occupancyPct + '%' : '--' }}
+                            </span>
+                          </div>
+                          <div class="comparison-row">
+                            <span class="text-xs text-muted">Volume</span>
+                            <span class="font-semibold text-sm">{{ b.volumeM3 != null ? (b.volumeM3 | number:'1.0-0') + ' m³' : '--' }}</span>
+                          </div>
+                          <div class="comparison-row">
+                            <span class="text-xs text-muted">Última medição</span>
+                            <span class="text-sm">{{ b.measurementAt ? (b.measurementAt | date:'HH:mm') : '--' }}</span>
+                          </div>
+                          <a class="box-row-link text-xs font-medium d-flex align-center gap-1 mt-2" [routerLink]="['/boxes', b.boxId]">
+                            Ver box
+                            <lucide-angular name="chevron-right" size="14"></lucide-angular>
+                          </a>
+                        </div>
+                      }
+                    </div>
+                  }
+                  @case ('measurement') {
+                    <p class="assistant-headline font-bold text-sm mb-2">{{ message.headline }}</p>
+                    <div class="measurement-card">
+                      <div class="d-flex justify-between align-start">
+                        <div class="measurement-value d-flex align-center gap-2">
+                          <span class="text-xl font-bold">
+                            {{ message.measurement!.volumeM3 != null ? (message.measurement!.volumeM3 | number:'1.0-0') + ' m³' : 'sem valor' }}
+                          </span>
+                          <span class="tag-id text-xs">{{ message.measurement!.measurementId }}</span>
+                        </div>
+                        <app-status-badge [status]="message.measurement!.status" type="measurement"></app-status-badge>
+                      </div>
+                      <div class="measurement-meta d-flex gap-4 mt-2 text-xs text-muted">
+                        <span>{{ message.measurement!.capturedAt | date:'dd/MM/yyyy HH:mm' }}</span>
+                        <span>Origem: {{ message.measurement!.source }}</span>
+                      </div>
+                    </div>
+                  }
+                  @case ('rejection') {
+                    <p class="assistant-headline font-bold text-sm mb-2">{{ message.headline }}</p>
+                    <div class="box-rows">
+                      @for (r of message.rejections; track r.attemptId) {
+                        <div class="rejection-row" [class.rejection-failed]="r.status === 'FAILED'">
+                          <div class="d-flex align-center gap-2 justify-between">
+                            <app-status-badge [status]="rejectionStatusLabel(r.status)" type="measurement"></app-status-badge>
+                            <span class="text-xs text-muted">{{ r.startedAt | date:'dd/MM HH:mm' }}</span>
+                          </div>
+                          <p class="text-sm mt-1 mb-1">{{ r.reason || 'Motivo não registrado.' }}</p>
+                          <span class="tag-id text-xs">{{ r.attemptId }}</span>
+                        </div>
+                      }
+                    </div>
+                  }
+                  @case ('no-evidence') {
+                    <div class="no-evidence d-flex gap-2 align-start">
+                      <lucide-angular name="info" size="16" class="text-muted mt-1"></lucide-angular>
+                      <p class="text-sm text-muted m-0">{{ message.text }}</p>
+                    </div>
+                  }
+                  @default {
+                    <p class="assistant-text text-sm m-0">{{ message.text }}</p>
+                  }
+                }
+
+                @if (message.citations && message.citations.length > 0) {
+                  <div class="sources mt-3">
+                    <span class="sources-label text-xs text-muted font-semibold">Fontes</span>
+                    <div class="d-flex gap-2 flex-wrap mt-1">
+                      @for (c of message.citations; track c.type + c.id) {
+                        @if (c.type === 'box') {
+                          <a class="badge source-chip text-xs" [routerLink]="['/boxes', c.id]">{{ c.label }}</a>
+                        } @else {
+                          <span class="badge source-chip text-xs">{{ c.label }}</span>
+                        }
+                      }
+                    </div>
+                  </div>
+                }
+
+                @if (isLastMessage(i) && message.suggestions && message.suggestions.length > 0) {
+                  <div class="suggestions d-flex gap-2 flex-wrap mt-3">
+                    @for (s of message.suggestions; track s.label) {
+                      <button type="button" class="suggestion-chip" (click)="onSuggestion(s)">{{ s.label }}</button>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        }
+
+        @if (waiting()) {
+          <div class="chat-row assistant">
+            <div class="assistant-avatar icon-container bg-primary-subtle text-primary">
+              <lucide-angular name="bot" size="16"></lucide-angular>
+            </div>
+            <div class="assistant-content">
+              <p class="assistant-text text-muted m-0">Consultando os registros…</p>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    <form class="composer d-flex gap-3" (submit)="onSubmit($event)">
+      <input
+        type="text"
+        [(ngModel)]="draft"
+        name="draft"
+        placeholder="Pergunte sobre boxes, medições, capacidade ou ocorrências..."
+        class="composer-input" />
+      <button type="submit" class="composer-send" [disabled]="waiting()" aria-label="Enviar pergunta">
+        <lucide-angular name="send" size="16"></lucide-angular>
+      </button>
+    </form>
+  </div>
+</div>

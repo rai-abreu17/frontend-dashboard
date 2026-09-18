@@ -6,6 +6,7 @@ import { Materiais } from './pages/materiais/materiais';
 import { Historico } from './pages/historico/historico';
 import { Relatorios } from './pages/relatorios/relatorios';
 import { Validacao } from './pages/validacao/validacao';
+import { Copiloto } from './pages/copiloto/copiloto';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -16,5 +17,6 @@ export const routes: Routes = [
   { path: 'historico', component: Historico },
   { path: 'relatorios', component: Relatorios },
   { path: 'validacao', component: Validacao },
+  { path: 'copiloto', component: Copiloto },
   { path: '**', redirectTo: 'dashboard' }
 ];

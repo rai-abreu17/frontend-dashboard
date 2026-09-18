@@ -13,17 +13,26 @@
   color: var(--color-nav-text);
   display: flex;
   flex-direction: column;
+  transition: width 0.2s ease;
+
+  &.expanded {
+    width: 220px;
+  }
 }
 
 @media (max-width: 768px) {
   .app-layout {
     flex-direction: column-reverse;
   }
-  
+
   .app-sidebar {
     width: 100%;
     height: 64px;
     flex-direction: row;
+
+    &.expanded {
+      width: 100%;
+    }
   }
 }
 
