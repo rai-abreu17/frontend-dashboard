@@ -28,4 +28,10 @@ export class MeasurementService {
   getAllMeasurements(): Observable<Measurement[]> {
     return this.measurements$.asObservable().pipe(delay(200));
   }
+
+  setLiveMeasurements(boxId: string, measurements: Measurement[]) {
+    const current = this.measurements$.getValue();
+    const rest = current.filter(m => m.boxId !== boxId);
+    this.measurements$.next([...rest, ...measurements]);
+  }
 }

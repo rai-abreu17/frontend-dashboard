@@ -4,4 +4,4 @@ export type MeasurementStatus = 'VALIDA' | 'VENCIDA' | 'INCONCLUSIVA' | 'INVALID
 
 export type AcquisitionAttemptStatus = 'SUCCESS' | 'FAILED' | 'INCONCLUSIVE';
 
-export type EventSource = 'DEMO' | 'LEGACY_IMPORT';
+export type EventSource = 'DEMO' | 'LEGACY_IMPORT' | 'LIVE_BENCH_SIMULATION';
